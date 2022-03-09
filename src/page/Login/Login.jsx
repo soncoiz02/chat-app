@@ -2,9 +2,9 @@ import React, { useEffect } from 'react'
 import './login.scss'
 
 import { GoogleAuthProvider, FacebookAuthProvider, getAuth, signInWithPopup, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
+import { doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
 import app from '../../firebase/firebaseConfig';
-import { getUser } from '../../firebase/user';
+import { getUser, setIsOnline } from '../../firebase/user';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { setInfor } from '../../redux/action/user';
@@ -23,9 +23,13 @@ const Login = () => {
     useEffect(() => {
         const authChange = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const userData = await getUser(user.providerData[0].uid)
-                dispatch(setInfor(userData))
-                navigate('/')
+                const userId = user.providerData[0].uid
+                const userData = await getUser(userId)
+                if (userData) {
+                    await setIsOnline(userId, true)
+                    dispatch(setInfor(userData))
+                    navigate('/')
+                }
             }
         })
 

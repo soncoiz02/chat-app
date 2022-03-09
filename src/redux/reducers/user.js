@@ -1,5 +1,6 @@
 const initialState = {
-    infor: {}
+    infor: {},
+    reciever: {}
 }
 
 const userReducers = (state = initialState, action) => {
@@ -9,6 +10,12 @@ const userReducers = (state = initialState, action) => {
             return {
                 ...state,
                 infor: infor
+            }
+        case "SET_RECIEVER":
+            const reciever = action.payload
+            return {
+                ...state,
+                reciever: reciever
             }
         default:
             return state

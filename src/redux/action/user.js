@@ -4,3 +4,10 @@ export const setInfor = (data) => {
         payload: data
     }
 }
+
+export const setReciever = (data) => {
+    return {
+        type: "SET_RECIEVER",
+        payload: data
+    }
+}
