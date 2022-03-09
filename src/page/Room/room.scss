@@ -1,0 +1,140 @@
+.message-room {
+  position: relative;
+  width: 100%;
+  display: flex;
+  .chat-box {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    .header {
+      position: absolute;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 15px;
+      box-shadow: 3px 0 5px 1px rgba(0, 0, 0, 0.1);
+      z-index: 50;
+      background: white;
+      .user {
+        display: flex;
+        gap: 0 10px;
+        .avt {
+          width: 50px;
+          aspect-ratio: 1;
+          overflow: hidden;
+          border-radius: 50%;
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+        .detail {
+          display: flex;
+          flex-direction: column;
+          .name {
+            font: {
+              size: 18px;
+              weight: 500;
+            }
+            color: rgb(66, 66, 66);
+          }
+
+          .status {
+            font-size: 16px;
+            color: gray;
+            display: flex;
+            align-items: center;
+            gap: 0 5px;
+            .dot {
+              width: 10px;
+              height: 10px;
+              border-radius: 50%;
+              background: #01bb36;
+            }
+          }
+        }
+      }
+
+      .btn-infor {
+        font-size: 25px;
+        color: gray;
+        cursor: pointer;
+        &:hover {
+          color: rgb(0, 85, 255);
+        }
+      }
+    }
+
+    .main-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: 100vh;
+      width: 100%;
+
+      .list-mess {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 10px 0;
+        width: 100%;
+        height: calc(100% - 60px);
+        padding: 15px 50px;
+        overflow-y: auto;
+        justify-content: flex-end;
+        .mess {
+          max-width: 80%;
+          font-size: 16px;
+          border-radius: 50px;
+          padding: 10px 15px;
+
+          &.sender {
+            background: rgb(0, 85, 255);
+            color: white;
+            align-self: flex-end;
+          }
+          &.reciever {
+            background: whitesmoke;
+            color: rgb(66, 66, 66);
+            align-self: flex-start;
+          }
+        }
+      }
+
+      .form {
+        display: flex;
+        align-items: center;
+        padding: 10px 50px;
+
+        input {
+          border: none;
+          outline: none;
+          color: rgb(66, 66, 66);
+          background: whitesmoke;
+          border-radius: 50px;
+          height: 40px;
+          width: 95%;
+          padding: 5px 20px;
+          font-family: "Roboto", sans-serif;
+          overflow-wrap: break-word;
+        }
+        button {
+          width: 5%;
+          background: none;
+          border: none;
+          cursor: pointer;
+          margin-left: 15px;
+          svg {
+            font-size: 20px;
+            color: rgb(0, 85, 255);
+          }
+        }
+      }
+    }
+  }
+}
