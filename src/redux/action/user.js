@@ -11,3 +11,10 @@ export const setReciever = (data) => {
         payload: data
     }
 }
+
+export const setOnlineUsers = (data) => {
+    return {
+        type: "SET_ONLINE_USERS",
+        payload: data
+    }
+}

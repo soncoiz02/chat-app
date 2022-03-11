@@ -5,24 +5,16 @@ import { getAllUser } from '../../firebase/user'
 import { setReciever } from '../../redux/action/user'
 import './listUser.scss'
 const ListUser = () => {
-    const [listUser, setListUser] = useState([])
     const userInfor = useSelector(state => state.user.infor)
+    const onlineUsers = useSelector(state => state.user.onlineUsers)
     const dispatch = useDispatch()
-    useEffect(() => {
-        const getData = async () => {
-            const data = await getAllUser()
-            const arr = []
-            data.forEach(doc => arr.push(doc.data()))
-            setListUser(arr.filter(e => e.uid !== userInfor.uid & e.isOnline === true))
-        }
-        getData()
-    }, [])
+    console.log(onlineUsers);
 
     return (
         <div className='list'>
             {
-                listUser &&
-                listUser.map((e, index) =>
+                onlineUsers.length > 0 &&
+                onlineUsers.map((e, index) =>
                     <div className="user" key={index}>
                         <div className="avt">
                             <img src={e.avatar} alt="" />
@@ -31,12 +23,17 @@ const ListUser = () => {
                             <div className="name">
                                 {e.fullname}
                             </div>
-                            <div className="status"><div className="dot"></div>Online</div>
+                            {
+                                e.isOnline === true ?
+                                    <div className="status"><div className="dot"></div>Online</div>
+                                    :
+                                    <div className="status"><div className="dot off"></div>Offline</div>
+                            }
                         </div>
                         <Link
                             className='btn-send'
                             to={`/room/${Number(e.uid) + Number(userInfor.uid)}`}
-                            onClick={() => dispatch(setReciever(listUser[index]))}
+                            onClick={() => dispatch(setReciever(onlineUsers[index]))}
                         >Send Message</Link>
                     </div>
                 )

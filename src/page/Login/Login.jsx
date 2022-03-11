@@ -4,10 +4,10 @@ import './login.scss'
 import { GoogleAuthProvider, FacebookAuthProvider, getAuth, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, getFirestore, setDoc, updateDoc } from 'firebase/firestore'
 import app from '../../firebase/firebaseConfig';
-import { getUser, setIsOnline } from '../../firebase/user';
+import { getAllUser, getUser, setIsOnline } from '../../firebase/user';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { setInfor } from '../../redux/action/user';
+import { setInfor, setOnlineUsers } from '../../redux/action/user';
 import { useNavigate } from 'react-router-dom';
 
 const ggProvider = new GoogleAuthProvider()
@@ -27,7 +27,14 @@ const Login = () => {
                 const userData = await getUser(userId)
                 if (userData) {
                     await setIsOnline(userId, true)
+                    const snapshot = await getAllUser()
+                    let users = []
+                    snapshot.forEach(e => {
+                        users.push(e.data())
+                    })
+                    users = users.filter(e => e.uid !== userId)
                     dispatch(setInfor(userData))
+                    dispatch(setOnlineUsers(users))
                     navigate('/')
                 }
             }

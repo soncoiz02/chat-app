@@ -1,0 +1,29 @@
+.list-mess {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px 0;
+  width: 100%;
+  height: calc(100% - 60px);
+  padding: 15px 50px;
+  overflow-y: auto;
+  justify-content: flex-end;
+  .mess {
+    max-width: 80%;
+    font-size: 16px;
+    border-radius: 50px;
+    padding: 10px 15px;
+    word-wrap: break-word;
+
+    &.sender {
+      background: rgb(0, 85, 255);
+      color: white;
+      align-self: flex-end;
+    }
+    &.reciever {
+      background: whitesmoke;
+      color: rgb(66, 66, 66);
+      align-self: flex-start;
+    }
+  }
+}

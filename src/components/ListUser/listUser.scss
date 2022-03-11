@@ -44,6 +44,10 @@
           height: 10px;
           border-radius: 50%;
           background: #01bb36;
+
+          &.off {
+            background: gray;
+          }
         }
       }
     }

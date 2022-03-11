@@ -82,12 +82,12 @@
             background: rgb(213, 213, 213);
           }
         }
-        &:hover > .list {
+        &:hover > .list-link {
           opacity: 1;
           visibility: visible;
           top: 35px;
         }
-        .list {
+        .list-link {
           position: absolute;
           z-index: 20;
           display: flex;
@@ -108,6 +108,7 @@
             display: flex;
             align-items: center;
             gap: 0 5px;
+            cursor: pointer;
             &:hover {
               background: rgba(255, 255, 255, 0.2);
             }

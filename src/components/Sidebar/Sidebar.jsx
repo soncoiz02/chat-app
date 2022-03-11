@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { BiDotsHorizontalRounded, BiSearchAlt, BiLogOut } from 'react-icons/bi'
 import { FaUser } from 'react-icons/fa'
 import './sidebar.scss'
@@ -12,13 +12,20 @@ const auth = getAuth(app)
 
 const Sidebar = () => {
     const userInfor = useSelector(state => state.user.infor)
+    const navigate = useNavigate()
 
     const [searchVal, setSearchVal] = useState('')
 
     window.addEventListener('unload', async () => {
-        await auth.signOut()
         await setIsOnline(userInfor.uid, false)
+        await auth.signOut()
     })
+
+    const handleLogout = async () => {
+        await setIsOnline(userInfor.uid, false)
+        await auth.signOut()
+        navigate('/login')
+    }
 
     return (
         <div className='sidebar'>
@@ -37,15 +44,15 @@ const Sidebar = () => {
                         <div className="setting-btn">
                             <BiDotsHorizontalRounded />
                         </div>
-                        <div className="list" >
+                        <div className="list-link" >
                             <Link to={'/account/asdas'} className='link'>
                                 <FaUser />
                                 Account
                             </Link>
-                            <Link to={'/account/asdas'} className='link'>
+                            <div className='link' onClick={handleLogout}>
                                 <BiLogOut />
                                 Logout
-                            </Link>
+                            </div>
                         </div>
                     </div>
                 </div>

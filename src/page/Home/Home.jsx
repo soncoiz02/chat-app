@@ -12,7 +12,7 @@ const Home = () => {
                     <a href='#list' className="btn-find">Find now</a>
                 </div>
                 <div className="list-user" id='list'>
-                    <h2>Active Users</h2>
+                    <h2>Online Users</h2>
                     <ListUser />
                 </div>
             </div>

@@ -1,6 +1,7 @@
 const initialState = {
     infor: {},
-    reciever: {}
+    reciever: {},
+    onlineUsers: []
 }
 
 const userReducers = (state = initialState, action) => {
@@ -16,6 +17,12 @@ const userReducers = (state = initialState, action) => {
             return {
                 ...state,
                 reciever: reciever
+            }
+        case "SET_ONLINE_USERS":
+            const users = action.payload
+            return {
+                ...state,
+                onlineUsers: users
             }
         default:
             return state
