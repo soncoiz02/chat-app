@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { FaExclamationCircle, FaPaperPlane } from 'react-icons/fa'
 import './room.scss'
 import { useParams } from 'react-router-dom'
-import { addMess, addRoomData, example, getRoomData } from '../../firebase/room'
+import { addMess, addRoomData, getRoomData } from '../../firebase/room'
 import LissMessage from '../../components/ListMessage/LissMessage'
 
 const Room = () => {
@@ -14,6 +14,9 @@ const Room = () => {
     const [roomData, setRoomData] = useState()
     const [listMess, setListMess] = useState([])
 
+    const [currentUserNickname, setCurrentUserNickname] = useState('')
+    const [recieveUserNickname, setRecieveUserNickname] = useState('')
+
     useEffect(() => {
         getData()
     }, [roomData])
@@ -23,6 +26,8 @@ const Room = () => {
         setRoomData(data)
         if (roomData) {
             setListMess(roomData.messages)
+            const reciveUserNickname = roomData.users.find(e => e.uid === recieveUser.uid).nickName
+            setRecieveUserNickname(reciveUserNickname)
         }
     }
 
@@ -72,8 +77,15 @@ const Room = () => {
                             <img src={recieveUser.avatar} alt="" />
                         </div>
                         <div className="detail">
-                            <div className="name">{recieveUser.fullname}</div>
-                            <div className="status"><div className="dot"></div>Online</div>
+                            <div className="name">
+                                {recieveUserNickname !== '' ? recieveUserNickname : recieveUser.fullname}
+                            </div>
+                            {
+                                recieveUser.isOnline === true ?
+                                    <div className="status"><div className="dot"></div>Online</div>
+                                    :
+                                    <div className="status"><div className="dot off"></div>Offline</div>
+                            }
                         </div>
                     </div>
                     <div className="btn-infor">
@@ -81,7 +93,11 @@ const Room = () => {
                     </div>
                 </div>
                 <div className="main-content">
-                    <LissMessage data={roomData?.messages} currentUserId={currentUser.uid} />
+                    <LissMessage
+                        data={roomData?.messages}
+                        currentUserId={currentUser.uid}
+                        roomId={roomId}
+                    />
                     <form action="" className="form" onSubmit={(e) => handleSendMess(e)}>
                         <input
                             type="text"

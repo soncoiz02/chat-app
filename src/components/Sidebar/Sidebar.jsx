@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { BiDotsHorizontalRounded, BiSearchAlt, BiLogOut } from 'react-icons/bi'
 import { FaUser } from 'react-icons/fa'
 import './sidebar.scss'
-import { getAuth } from 'firebase/auth'
+import { getAuth, signOut } from 'firebase/auth'
 import app from '../../firebase/firebaseConfig'
 import { useSelector } from 'react-redux'
 import { setIsOnline } from '../../firebase/user'
@@ -18,7 +18,7 @@ const Sidebar = () => {
 
     window.addEventListener('unload', async () => {
         await setIsOnline(userInfor.uid, false)
-        await auth.signOut()
+        await signOut(auth)
     })
 
     const handleLogout = async () => {

@@ -30,3 +30,9 @@ export const addMess = async (roomId, data) => {
     const dbRef = ref(db, `rooms/${roomId}/messages`)
     await set(dbRef, data)
 }
+
+
+export const deleteMess = async (roomId, index, uid) => {
+    const dbRef = ref(db, `rooms/${roomId}/messages/${index}`)
+    await set(dbRef, { sender: uid, content: "This message has been removed" })
+}

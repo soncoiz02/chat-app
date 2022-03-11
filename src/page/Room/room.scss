@@ -16,7 +16,7 @@
       width: 100%;
       padding: 10px 15px;
       box-shadow: 3px 0 5px 1px rgba(0, 0, 0, 0.1);
-      z-index: 50;
+      z-index: 20;
       background: white;
       .user {
         display: flex;
@@ -54,6 +54,10 @@
               height: 10px;
               border-radius: 50%;
               background: #01bb36;
+
+              &.off {
+                background: gray;
+              }
             }
           }
         }
