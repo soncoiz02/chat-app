@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { setReciever } from '../../redux/action/user'
@@ -7,7 +7,6 @@ const ListUser = () => {
     const userInfor = useSelector(state => state.user.infor)
     const onlineUsers = useSelector(state => state.user.onlineUsers)
     const dispatch = useDispatch()
-    console.log(onlineUsers);
 
     return (
         <div className='list'>

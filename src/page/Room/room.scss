@@ -80,36 +80,6 @@
       justify-content: flex-end;
       height: 100vh;
       width: 100%;
-
-      .form {
-        display: flex;
-        align-items: center;
-        padding: 10px 50px;
-
-        input {
-          border: none;
-          outline: none;
-          color: rgb(66, 66, 66);
-          background: whitesmoke;
-          border-radius: 50px;
-          height: 40px;
-          width: 95%;
-          padding: 5px 20px;
-          font-family: "Roboto", sans-serif;
-          overflow-wrap: break-word;
-        }
-        button {
-          width: 5%;
-          background: none;
-          border: none;
-          cursor: pointer;
-          margin-left: 15px;
-          svg {
-            font-size: 20px;
-            color: rgb(0, 85, 255);
-          }
-        }
-      }
     }
   }
 }

@@ -1,0 +1,122 @@
+.mess-form {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 10px 30px;
+  width: 100%;
+  gap: 0 20px;
+
+  .form {
+    position: relative;
+    display: flex;
+    width: 85%;
+    flex-direction: column;
+    gap: 10px 0;
+    .preview-file {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0 10px;
+      .img {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        width: 100px;
+        border-radius: 5px;
+        overflow: hidden;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+
+    input {
+      background: whitesmoke;
+      border-radius: 50px;
+      border: none;
+      outline: none;
+      padding: 5px 20px;
+      color: rgb(66, 66, 66);
+      height: 40px;
+      width: 100%;
+      font-family: "Roboto", sans-serif;
+      overflow-wrap: break-word;
+    }
+    button {
+      position: absolute;
+      right: 15px;
+      bottom: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      svg {
+        font-size: 20px;
+        color: rgb(0, 85, 255);
+      }
+    }
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    align-self: flex-end;
+    width: 15%;
+    position: relative;
+    gap: 0 15px;
+
+    .btn-add {
+      position: relative;
+
+      &:hover > .detail {
+        opacity: 1;
+        visibility: visible;
+      }
+      &.file {
+        position: relative;
+        label {
+          font-size: 24px;
+          color: #0055ff;
+          cursor: pointer;
+        }
+        input {
+          display: none;
+        }
+      }
+
+      &.icon {
+        svg {
+          font-size: 24px;
+          color: #0055ff;
+          cursor: pointer;
+        }
+      }
+
+      .detail {
+        padding: 5px;
+        font: {
+          size: 12px;
+          weight: 500;
+        }
+        color: white;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 3px;
+        position: absolute;
+        bottom: 35px;
+        left: -20px;
+        min-width: 80px;
+        text-align: center;
+        visibility: hidden;
+        opacity: 0;
+        transition: 0.3s;
+      }
+    }
+
+    .list-icon {
+      position: absolute;
+      bottom: 55px;
+      right: 50px;
+    }
+  }
+}

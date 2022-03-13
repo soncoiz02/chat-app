@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react'
+import { FaExclamationCircle } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
-import { FaExclamationCircle, FaPaperPlane } from 'react-icons/fa'
-import './room.scss'
 import { useParams } from 'react-router-dom'
-import { addMess, addRoomData, getRoomData } from '../../firebase/room'
 import LissMessage from '../../components/ListMessage/LissMessage'
+import MessForm from '../../components/MessForm/MessForm'
+import { getRoomData } from '../../firebase/room'
+import './room.scss'
 
 const Room = () => {
     const currentUser = useSelector(state => state.user.infor)
     const recieveUser = useSelector(state => state.user.reciever)
     const roomId = useParams().id
-    const [messVal, setMessVal] = useState('')
     const [roomData, setRoomData] = useState()
     const [listMess, setListMess] = useState([])
 
-    const [currentUserNickname, setCurrentUserNickname] = useState('')
     const [recieveUserNickname, setRecieveUserNickname] = useState('')
 
     useEffect(() => {
@@ -28,43 +27,6 @@ const Room = () => {
             setListMess(roomData.messages)
             const reciveUserNickname = roomData.users.find(e => e.uid === recieveUser.uid).nickName
             setRecieveUserNickname(reciveUserNickname)
-        }
-    }
-
-    const handleSendMess = async (e) => {
-        e.preventDefault()
-        if (messVal !== '') {
-            if (roomData) {
-                const newMess = {
-                    sender: currentUser.uid,
-                    content: messVal
-                }
-                listMess.push(newMess)
-                await addMess(roomId, listMess)
-            }
-            else {
-                const data = {
-                    messages: [
-                        {
-                            sender: currentUser.uid,
-                            content: messVal
-                        }
-                    ],
-                    users: [
-                        {
-                            uid: currentUser.uid,
-                            nickName: currentUser.fullname
-                        },
-                        {
-                            uid: recieveUser.uid,
-                            nickName: recieveUser.fullname
-                        }
-                    ],
-                    colorTheme: "blue"
-                }
-                addRoomData(roomId, data)
-            }
-            setMessVal('')
         }
     }
 
@@ -98,17 +60,13 @@ const Room = () => {
                         currentUserId={currentUser.uid}
                         roomId={roomId}
                     />
-                    <form action="" className="form" onSubmit={(e) => handleSendMess(e)}>
-                        <input
-                            type="text"
-                            value={messVal}
-                            onChange={(e) => setMessVal(e.target.value)}
-                            placeholder='Write something'
-                        />
-                        <button type='submit'>
-                            <FaPaperPlane />
-                        </button>
-                    </form>
+                    <MessForm
+                        roomData={roomData}
+                        roomId={roomId}
+                        listMess={listMess}
+                        currentUser={currentUser}
+                        recieveUser={recieveUser}
+                    />
                 </div>
                 <div className="setting-box"></div>
             </div>
