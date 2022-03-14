@@ -1,0 +1,147 @@
+.room-infor {
+  position: relative;
+  padding: 15px;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  width: 450px;
+  align-items: center;
+  gap: 20px 0;
+  z-index: 60;
+
+  .user {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px 0;
+    .avt {
+      width: 150px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      overflow: hidden;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    .name {
+      font: {
+        size: 20px;
+        weight: 500;
+      }
+      color: #424242;
+    }
+  }
+  .setting {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px 0;
+    .change {
+      display: flex;
+      flex-direction: column;
+      gap: 10px 0;
+      p {
+        font: {
+          size: 18px;
+          weight: 500;
+        }
+        position: relative;
+        color: #424242;
+        cursor: pointer;
+        padding: 12px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        svg {
+          margin-right: 10px;
+        }
+        .circle {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: rgb(0, 85, 255);
+          margin-right: 10px;
+        }
+        &:hover {
+          background: rgba(0, 0, 0, 0.1);
+        }
+        &::after {
+          content: "";
+          position: absolute;
+          width: 100%;
+          background: rgba(0, 0, 0, 0.1);
+          height: 1px;
+          left: 0;
+          bottom: 0;
+        }
+      }
+      .list-user {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 5px 0;
+        .item {
+          display: flex;
+          align-items: center;
+          gap: 0 5px;
+          .avt {
+            aspect-ratio: 1;
+            width: 35px;
+            border-radius: 50%;
+            overflow: hidden;
+            img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+          input {
+            font: {
+              size: 14px;
+              weight: 500;
+            }
+            width: calc(100% - 40px);
+            padding: 8px;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: whitesmoke;
+          }
+        }
+      }
+      .btn-apply {
+        padding: 10px 25px;
+        border-radius: 5px;
+        border: none;
+        background: rgb(0, 85, 255);
+        align-self: center;
+        font: {
+          size: 16px;
+          weight: 500;
+        }
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .list-theme {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 15px;
+        .theme {
+          width: 25px;
+          height: 25px;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
