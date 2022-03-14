@@ -1,6 +1,5 @@
 import app from "./firebaseConfig";
-import { child, get, getDatabase, onValue, ref, set, update } from 'firebase/database'
-import { async } from "@firebase/util";
+import { child, get, getDatabase, onValue, orderByValue, query, ref, set } from 'firebase/database'
 const db = getDatabase(app)
 
 export const addRoomData = async (roomId, data) => {
@@ -14,16 +13,25 @@ export const getRoomData = async (roomId) => {
     return snapshot.val()
 }
 
+export const getListMess = async (roomId) => {
+    const dbRef = ref(db)
+    const snapshot = await get(child(dbRef, `rooms/${roomId}/messages`))
+    return snapshot.val()
+}
 
-export const example = async () => {
-    const connectedRef = ref(db, ".info/connected");
-    onValue(connectedRef, (snap) => {
-        if (snap.val() === true) {
-            console.log("connected");
-        } else {
-            console.log("not connected");
+export const getAllRoomData = async () => {
+    let data = {}
+    onValue(ref(db, 'rooms/'), (snapshot) => {
+        if (snapshot.exists()) {
+            data = snapshot.val()
         }
-    });
+    })
+    return data
+}
+
+export const example = async (id) => {
+    const data = query(ref(db, 'rooms'), orderByValue(id))
+    console.log(data)
 }
 
 export const addMess = async (roomId, data) => {
@@ -35,4 +43,9 @@ export const addMess = async (roomId, data) => {
 export const deleteMess = async (roomId, index, uid) => {
     const dbRef = ref(db, `rooms/${roomId}/messages/${index}`)
     await set(dbRef, { sender: uid, content: "This message has been removed" })
+}
+
+export const setOfflineUser = async (roomId, data) => {
+    const dbRef = ref(db, `rooms/${roomId}`)
+    await set(dbRef, data)
 }

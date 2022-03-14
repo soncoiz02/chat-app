@@ -1,16 +1,17 @@
 import EmojiPicker from 'emoji-picker-react'
 import React, { useRef, useState } from 'react'
 import { BsFillImageFill } from 'react-icons/bs'
+import { FaPaperPlane } from 'react-icons/fa'
 import { HiEmojiHappy } from 'react-icons/hi'
 import { addMess, addRoomData } from '../../firebase/room'
-import { FaPaperPlane } from 'react-icons/fa'
 import './messForm.scss'
 
 
-const MessForm = ({ roomData, roomId, listMess, currentUser, recieveUser }) => {
+const MessForm = ({ roomId, roomData, listMess, currentUser, recieveUser }) => {
     const [messVal, setMessVal] = useState('')
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
     const [files, setFiles] = useState([])
+
 
     const fileRef = useRef()
 
@@ -36,6 +37,7 @@ const MessForm = ({ roomData, roomId, listMess, currentUser, recieveUser }) => {
             }
             else {
                 const data = {
+                    id: roomId,
                     messages: [
                         {
                             sender: currentUser.uid,
@@ -45,11 +47,15 @@ const MessForm = ({ roomData, roomId, listMess, currentUser, recieveUser }) => {
                     users: [
                         {
                             uid: currentUser.uid,
-                            nickName: currentUser.fullname
+                            nickName: currentUser.fullname,
+                            avatar: currentUser.avatar,
+                            isOnline: currentUser.isOnline
                         },
                         {
                             uid: recieveUser.uid,
-                            nickName: recieveUser.fullname
+                            nickName: recieveUser.fullname,
+                            avatar: recieveUser.avatar,
+                            isOnline: recieveUser.isOnline
                         }
                     ],
                     colorTheme: "blue"

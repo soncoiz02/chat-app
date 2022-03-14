@@ -1,12 +1,15 @@
-import React, { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { BiDotsHorizontalRounded, BiSearchAlt, BiLogOut } from 'react-icons/bi'
-import { FaUser } from 'react-icons/fa'
-import './sidebar.scss'
-import { getAuth, signOut } from 'firebase/auth'
-import app from '../../firebase/firebaseConfig'
+import { async } from '@firebase/util'
+import { getAuth } from 'firebase/auth'
+import React, { useEffect, useState } from 'react'
+import { BiDotsHorizontalRounded, BiLogOut, BiSearchAlt } from 'react-icons/bi'
+import { FaHome, FaUser } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
+import app from '../../firebase/firebaseConfig'
+import { getAllRoomData, setOfflineUser } from '../../firebase/room'
 import { setIsOnline } from '../../firebase/user'
+import ListFriends from '../ListFriends/ListFriends'
+import './sidebar.scss'
 
 const auth = getAuth(app)
 
@@ -15,14 +18,25 @@ const Sidebar = () => {
     const navigate = useNavigate()
 
     const [searchVal, setSearchVal] = useState('')
+    const [listFriends, setListFriends] = useState([])
 
-    window.addEventListener('unload', async () => {
-        await setIsOnline(userInfor.uid, false)
-        await signOut(auth)
-    })
+    useEffect(() => {
+        const getData = async () => {
+            const data = await getAllRoomData()
+            if (data) {
+                const dataFilter = Object.values(data).filter(e => e.users.find(e => e.uid === userInfor.uid))
+                setListFriends(dataFilter)
+            }
+        }
+        getData()
+    }, [listFriends.length])
 
     const handleLogout = async () => {
         await setIsOnline(userInfor.uid, false)
+        listFriends.forEach(e => e.users.find(e => e.uid === userInfor.uid).isOnline = false)
+        listFriends.forEach(async (e) => {
+            await setOfflineUser(e.id, e)
+        })
         await auth.signOut()
         navigate('/login')
     }
@@ -45,6 +59,10 @@ const Sidebar = () => {
                             <BiDotsHorizontalRounded />
                         </div>
                         <div className="list-link" >
+                            <Link to={'/'} className='link'>
+                                <FaHome />
+                                Home
+                            </Link>
                             <Link to={'/account/asdas'} className='link'>
                                 <FaUser />
                                 Account
@@ -67,29 +85,7 @@ const Sidebar = () => {
                 </form>
             </div>
             <div className="sidebar-main">
-                {
-                    userInfor?.listFriends?.lenght > 0 ?
-                        <div className="list-friends">
-                            <Link to={`/room/1232`} className="item">
-                                <div className="user">
-                                    <div className="avt">
-                                        <img src="" alt="" />
-                                        <div className="dot"></div>
-                                    </div>
-                                    <div className="detail">
-                                        <div className="display-name">ABSKS</div>
-                                        <div className="recent-mess">You: daskjgdjhsaguwqdhqwk</div>
-                                    </div>
-                                </div>
-                                <div className="status">
-                                </div>
-                            </Link>
-                        </div>
-                        :
-                        <div className="empty">
-                            You haven't have any friend. Find some friend to start chat.
-                        </div>
-                }
+                <ListFriends listFriends={listFriends} />
             </div>
         </div>
     )

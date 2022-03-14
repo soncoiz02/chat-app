@@ -20,6 +20,7 @@
       background: white;
       .user {
         display: flex;
+        align-items: center;
         gap: 0 10px;
         .avt {
           width: 50px;
@@ -65,11 +66,8 @@
 
       .btn-infor {
         font-size: 25px;
-        color: gray;
+        color: rgb(0, 85, 255);
         cursor: pointer;
-        &:hover {
-          color: rgb(0, 85, 255);
-        }
       }
     }
 

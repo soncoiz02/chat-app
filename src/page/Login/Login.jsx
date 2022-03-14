@@ -62,8 +62,7 @@ const Login = () => {
             uid: uid,
             fullname: displayName,
             avatar: photoURL,
-            isOnline: false,
-            listFriends: []
+            isOnline: false
         }
         handleExistUser(uid, userData)
     }

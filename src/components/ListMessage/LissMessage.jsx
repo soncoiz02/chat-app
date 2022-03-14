@@ -1,14 +1,29 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { BsFillTrashFill, BsThreeDotsVertical } from 'react-icons/bs'
+import { useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
+import { deleteMess, getListMess } from '../../firebase/room'
 import './listmess.scss'
-import { BsThreeDotsVertical, BsFillTrashFill } from 'react-icons/bs'
-import { deleteMess } from '../../firebase/room'
 
-const LissMessage = ({ data, currentUserId, roomId }) => {
+const LissMessage = () => {
+    const currentUserId = useSelector(state => state.user.infor).uid
+    const roomId = useParams().id
+    const [listMess, setListMess] = useState(null)
+    useEffect(() => {
+        const get = getData()
+        return get
+    }, [listMess])
+
+    const getData = async () => {
+        const data = await getListMess(roomId)
+        setListMess(data)
+    }
+
     return (
 
         <div className="list-mess">
             {
-                data?.map((mess, index) =>
+                listMess?.map((mess, index) =>
                     mess.sender === currentUserId ?
                         <div className='mess sender' key={index}>
                             <div className="btn-setting">

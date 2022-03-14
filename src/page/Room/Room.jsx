@@ -18,16 +18,14 @@ const Room = () => {
 
     useEffect(() => {
         getData()
-    }, [roomData])
+    }, [])
 
     const getData = async () => {
         const data = await getRoomData(roomId)
         setRoomData(data)
-        if (roomData) {
-            setListMess(roomData.messages)
-            const reciveUserNickname = roomData.users.find(e => e.uid === recieveUser.uid).nickName
-            setRecieveUserNickname(reciveUserNickname)
-        }
+        setListMess(data?.messages)
+        const reciveUserNickname = data?.users?.find(e => e.uid === recieveUser.uid)?.nickName
+        setRecieveUserNickname(reciveUserNickname)
     }
 
     return (
@@ -55,11 +53,7 @@ const Room = () => {
                     </div>
                 </div>
                 <div className="main-content">
-                    <LissMessage
-                        data={roomData?.messages}
-                        currentUserId={currentUser.uid}
-                        roomId={roomId}
-                    />
+                    <LissMessage />
                     <MessForm
                         roomData={roomData}
                         roomId={roomId}

@@ -1,0 +1,85 @@
+.list-friends {
+  display: flex;
+  flex-direction: column;
+  gap: 10px 0;
+  height: 550px;
+  overflow-y: auto;
+  width: 100%;
+
+  .item {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+    border-radius: 5px;
+    &:hover {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 0 10px;
+      width: 90%;
+
+      .avt {
+        width: 50px;
+        height: 50px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #000;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .detail {
+        display: flex;
+        flex-direction: column;
+        width: calc(100% - 60px);
+
+        .display-name {
+          font: {
+            size: 16px;
+            weight: 500;
+          }
+          width: 100%;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow-x: hidden;
+          color: rgb(66, 66, 66);
+        }
+        .recent-mess {
+          font-size: 14px;
+          color: gray;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow-x: hidden;
+          width: 100%;
+        }
+      }
+    }
+
+    .status {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      position: absolute;
+      border: 2px solid white;
+      bottom: 8px;
+
+      &.on {
+        background: #01bb36;
+      }
+      &.off {
+        background: gray;
+      }
+    }
+  }
+}
