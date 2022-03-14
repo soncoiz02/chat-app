@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import LissMessage from '../../components/ListMessage/LissMessage'
 import MessForm from '../../components/MessForm/MessForm'
+import RoomInfor from '../../components/RoomInfor/RoomInfor'
 import { getRoomData } from '../../firebase/room'
 import './room.scss'
 
@@ -13,12 +14,13 @@ const Room = () => {
     const roomId = useParams().id
     const [roomData, setRoomData] = useState()
     const [listMess, setListMess] = useState([])
+    const [activeRoomInfor, setActiveRoomInfor] = useState(false)
 
     const [recieveUserNickname, setRecieveUserNickname] = useState('')
 
     useEffect(() => {
         getData()
-    }, [])
+    }, [roomId])
 
     const getData = async () => {
         const data = await getRoomData(roomId)
@@ -48,7 +50,7 @@ const Room = () => {
                             }
                         </div>
                     </div>
-                    <div className="btn-infor">
+                    <div className="btn-infor" onClick={() => setActiveRoomInfor(!activeRoomInfor)}>
                         <FaExclamationCircle />
                     </div>
                 </div>
@@ -62,8 +64,11 @@ const Room = () => {
                         recieveUser={recieveUser}
                     />
                 </div>
-                <div className="setting-box"></div>
             </div>
+            {
+                activeRoomInfor &&
+                <RoomInfor recieveUser={recieveUser} roomData={roomData} />
+            }
         </div>
     )
 }
