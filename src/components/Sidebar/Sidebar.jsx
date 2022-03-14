@@ -29,7 +29,7 @@ const Sidebar = () => {
             }
         }
         getData()
-    }, [listFriends.length])
+    }, [listFriends])
 
     const handleLogout = async () => {
         await setIsOnline(userInfor.uid, false)

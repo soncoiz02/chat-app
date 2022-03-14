@@ -10,8 +10,7 @@ const LissMessage = () => {
     const roomId = useParams().id
     const [listMess, setListMess] = useState(null)
     useEffect(() => {
-        const get = getData()
-        return get
+        getData()
     }, [listMess])
 
     const getData = async () => {

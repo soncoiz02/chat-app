@@ -20,18 +20,15 @@ export const getListMess = async (roomId) => {
 }
 
 export const getAllRoomData = async () => {
-    let data = {}
-    onValue(ref(db, 'rooms/'), (snapshot) => {
-        if (snapshot.exists()) {
-            data = snapshot.val()
-        }
-    })
-    return data
+    const dbRef = ref(db)
+    const snapshot = await get(child(dbRef, `rooms/`))
+    return snapshot.val()
 }
 
-export const example = async (id) => {
-    const data = query(ref(db, 'rooms'), orderByValue(id))
-    console.log(data)
+export const example = async () => {
+    const dbRef = ref(db)
+    const snapshot = await get(child(dbRef, `rooms/`))
+    console.log(snapshot.val())
 }
 
 export const addMess = async (roomId, data) => {

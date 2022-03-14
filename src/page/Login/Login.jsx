@@ -9,6 +9,7 @@ import { getAllUser, getUser, setIsOnline } from '../../firebase/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { setInfor, setOnlineUsers } from '../../redux/action/user';
 import { useNavigate } from 'react-router-dom';
+import { getAllRoomData, setOfflineUser } from '../../firebase/room';
 
 const ggProvider = new GoogleAuthProvider()
 const fbProvider = new FacebookAuthProvider()
@@ -25,8 +26,14 @@ const Login = () => {
             if (user) {
                 const userId = user.providerData[0].uid
                 const userData = await getUser(userId)
+                const listRoomData = await getAllRoomData()
                 if (userData) {
                     await setIsOnline(userId, true)
+                    const listFriends = Object.values(listRoomData).filter(e => e.users.find(e => e.uid === userData.uid))
+                    listFriends.forEach(e => e.users.find(e => e.uid === userData.uid).isOnline = true)
+                    listFriends.forEach(async (e) => {
+                        await setOfflineUser(e.id, e)
+                    })
                     const snapshot = await getAllUser()
                     let users = []
                     snapshot.forEach(e => {

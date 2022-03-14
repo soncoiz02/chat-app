@@ -13,9 +13,9 @@ const ListFriends = ({ listFriends }) => {
                 listFriends.length > 0 ?
                     listFriends.map((e, index) =>
                         <Link
-                            to={`/room/${e.users.reduce((a, b) => Number(a.uid) + Number(b.uid))}`}
-                            className="item"
                             key={index}
+                            className="item"
+                            to={`/room/${e.users.reduce((a, b) => Number(a.uid) + Number(b.uid))}`}
                             onClick={() => dispatch(setReciever(e.users.find(e => e.uid !== userInfor.uid)))}
                         >
                             <div className="user">
