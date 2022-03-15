@@ -8,7 +8,7 @@
   padding: 15px 50px;
   overflow-y: auto;
   justify-content: flex-end;
-  background: #f6feff;
+  background: var(--bg-color);
   .mess {
     position: relative;
     display: flex;
@@ -63,14 +63,14 @@
     &.sender {
       align-self: flex-end;
       .content {
-        background: rgb(0, 85, 255);
+        background: var(--main-color);
         color: white;
       }
     }
     &.reciever {
       align-self: flex-start;
       .content {
-        background: whitesmoke;
+        background: var(--sec-color);
         color: rgb(66, 66, 66);
       }
     }

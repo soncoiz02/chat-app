@@ -63,7 +63,7 @@
           width: 30px;
           height: 30px;
           border-radius: 50%;
-          background: rgb(0, 85, 255);
+          background: var(--main-color);
           margin-right: 10px;
         }
         &:hover {
@@ -118,7 +118,7 @@
         padding: 10px 25px;
         border-radius: 5px;
         border: none;
-        background: rgb(0, 85, 255);
+        background: var(--main-color);
         align-self: center;
         font: {
           size: 16px;

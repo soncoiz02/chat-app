@@ -46,3 +46,8 @@ export const setOfflineUser = async (roomId, data) => {
     const dbRef = ref(db, `rooms/${roomId}`)
     await set(dbRef, data)
 }
+
+export const changeTheme = async (roomId, color) => {
+    const themeRef = ref(db, `rooms/${roomId}/colorTheme`)
+    await set(themeRef, color)
+}

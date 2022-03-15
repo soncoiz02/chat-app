@@ -58,7 +58,12 @@ const MessForm = ({ roomId, roomData, listMess, currentUser, recieveUser }) => {
                             isOnline: recieveUser.isOnline
                         }
                     ],
-                    colorTheme: "blue"
+                    colorTheme: {
+                        primary: '#5555ff',
+                        secondary: 'whitesmoke',
+                        color: '#5555ff',
+                        bg: '#f1fcff'
+                    }
                 }
                 addRoomData(roomId, data)
             }
