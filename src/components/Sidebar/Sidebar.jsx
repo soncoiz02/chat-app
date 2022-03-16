@@ -31,6 +31,17 @@ const Sidebar = () => {
         getData()
     }, [listFriends])
 
+    useEffect(() => {
+        window.addEventListener('beforeunload', onUnload)
+
+        return window.removeEventListener('beforeunload', onUnload)
+    })
+
+    const onUnload = (e) => {
+        e.preventDefault()
+        e.returnValue = 'Hello'
+    }
+
     const handleLogout = async () => {
         await setIsOnline(userInfor.uid, false)
         listFriends.forEach(e => e.users.find(e => e.uid === userInfor.uid).isOnline = false)

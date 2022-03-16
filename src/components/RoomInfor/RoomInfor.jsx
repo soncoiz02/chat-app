@@ -1,9 +1,9 @@
 import { async } from '@firebase/util'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaPen } from 'react-icons/fa'
 import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router-dom'
-import { changeTheme } from '../../firebase/room'
+import { changeNickname, changeTheme } from '../../firebase/room'
 import { setTheme } from '../../redux/action/room'
 import './roomInfor.scss'
 
@@ -64,40 +64,73 @@ const listTheme = [
     }
 ]
 
-const RoomInfor = ({ recieveUser, roomData }) => {
-    const [nickNameVal, setNickNameVal] = useState('')
+const RoomInfor = ({ recieveUser, roomData, currentUser }) => {
     const roomId = useParams().id
     const dispatch = useDispatch()
+
+    const [mainUser, setMainUser] = useState()
+    const [otherUser, setOtherUser] = useState()
+
+    const [mainUserNickname, setMainUserNickname] = useState('')
+    const [otherUserNickname, setOtherUserNickname] = useState('')
+
+    useEffect(() => {
+        setMainUser(roomData.users.find(e => e.uid === currentUser.uid))
+        setOtherUser(roomData.users.find(e => e.uid !== currentUser.uid))
+    }, [roomData])
 
     const handleChangeTheme = async (theme) => {
         await changeTheme(roomId, theme)
         dispatch(setTheme(theme))
     }
 
+    const handleChangeNickname = async () => {
+        if (mainUserNickname) {
+            roomData.users.find(e => e.uid === currentUser.uid).nickName = mainUserNickname
+        }
+        if (otherUserNickname) {
+            roomData.users.find(e => e.uid !== currentUser.uid).nickName = otherUserNickname
+        }
+        await changeNickname(roomId, roomData.users)
+    }
+
     return (
         <div className='room-infor'>
             <div className="user">
                 <div className="avt">
-                    <img src={recieveUser.avatar} alt="" />
+                    <img src={otherUser?.avatar} alt="" />
                 </div>
-                <div className="name">{recieveUser.nickName}</div>
+                <div className="name">{otherUser?.nickName}</div>
             </div>
             <div className="setting">
                 <div className="change">
                     <p><FaPen />Edit nicknames</p>
                     <div className="list-user">
-                        {
-                            roomData?.users?.map((e, index) =>
-                                <div className="item" key={index}>
-                                    <div className="avt">
-                                        <img src={e.avatar} alt="" />
-                                    </div>
-                                    <input type="text" value={nickNameVal} placeholder={e.nickName} onChange={(e) => setNickNameVal(e.target.value)} />
-                                </div>
-                            )
-                        }
+                        <div className="item">
+                            <div className="avt">
+                                <img src={mainUser?.avatar} alt="" />
+                            </div>
+                            <input type="text"
+                                value={mainUserNickname}
+                                placeholder={mainUser?.nickName}
+                                onChange={(e) => setMainUserNickname(e.target.value)}
+                            />
+                        </div>
                     </div>
-                    <button className="btn-apply">Apply</button>
+                    <div className="list-user">
+                        <div className="item">
+                            <div className="avt">
+                                <img src={otherUser?.avatar} alt="" />
+                            </div>
+                            <input
+                                type="text"
+                                value={otherUserNickname}
+                                placeholder={otherUser?.nickName}
+                                onChange={(e) => setOtherUserNickname(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <button className="btn-apply" onClick={handleChangeNickname}>Apply</button>
                 </div>
                 <div className="change">
                     <p><span className="circle"></span>Change theme</p>

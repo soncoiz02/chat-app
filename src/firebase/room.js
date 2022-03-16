@@ -51,3 +51,8 @@ export const changeTheme = async (roomId, color) => {
     const themeRef = ref(db, `rooms/${roomId}/colorTheme`)
     await set(themeRef, color)
 }
+
+export const changeNickname = async (roomId, data) => {
+    const userRef = ref(db, `rooms/${roomId}/users`)
+    await set(userRef, data)
+}

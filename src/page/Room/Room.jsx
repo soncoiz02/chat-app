@@ -73,7 +73,7 @@ const Room = () => {
             </div>
             {
                 activeRoomInfor &&
-                <RoomInfor recieveUser={recieveUser} roomData={roomData} />
+                <RoomInfor recieveUser={recieveUser} roomData={roomData} currentUser={currentUser} />
             }
         </div>
     )
