@@ -3,13 +3,18 @@ import React, { useRef, useState } from 'react'
 import { BsFillImageFill } from 'react-icons/bs'
 import { FaPaperPlane } from 'react-icons/fa'
 import { HiEmojiHappy } from 'react-icons/hi'
-import { addMess, addRoomData } from '../../firebase/room'
+import { useDispatch, useSelector } from 'react-redux'
+import { addMess } from '../../firebase/room'
+import { setListMess } from '../../redux/action/room'
 import './messForm.scss'
 
 
-const MessForm = ({ roomId, roomData, listMess, currentUser, recieveUser }) => {
-    const [messVal, setMessVal] = useState('')
+const MessForm = ({ roomId, currentUser }) => {
+    const listMess = useSelector(state => state.room.listMess)
+    const dispatch = useDispatch()
+
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+    const [messVal, setMessVal] = useState('')
     const [files, setFiles] = useState([])
 
 
@@ -27,45 +32,19 @@ const MessForm = ({ roomId, roomData, listMess, currentUser, recieveUser }) => {
             })
         }
         if (messVal !== '') {
-            if (roomData) {
-                const newMess = {
-                    sender: currentUser.uid,
-                    content: messVal
-                }
+            const newMess = {
+                sender: currentUser.uid,
+                content: messVal
+            }
+            if (listMess) {
                 listMess.push(newMess)
                 await addMess(roomId, listMess)
+                dispatch(setListMess(listMess))
             }
             else {
-                const data = {
-                    id: roomId,
-                    messages: [
-                        {
-                            sender: currentUser.uid,
-                            content: messVal
-                        }
-                    ],
-                    users: [
-                        {
-                            uid: currentUser.uid,
-                            nickName: currentUser.fullname,
-                            avatar: currentUser.avatar,
-                            isOnline: currentUser.isOnline
-                        },
-                        {
-                            uid: recieveUser.uid,
-                            nickName: recieveUser.fullname,
-                            avatar: recieveUser.avatar,
-                            isOnline: recieveUser.isOnline
-                        }
-                    ],
-                    colorTheme: {
-                        primary: '#5555ff',
-                        secondary: 'whitesmoke',
-                        color: '#5555ff',
-                        bg: '#f1fcff'
-                    }
-                }
-                addRoomData(roomId, data)
+                const firstMess = [newMess]
+                await addMess(roomId, firstMess)
+                dispatch(setListMess(firstMess))
             }
             setMessVal('')
         }
