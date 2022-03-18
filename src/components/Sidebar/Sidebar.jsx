@@ -1,13 +1,17 @@
-import { async } from '@firebase/util'
-import { getAuth } from 'firebase/auth'
 import React, { useEffect, useState } from 'react'
+
 import { BiDotsHorizontalRounded, BiLogOut, BiSearchAlt } from 'react-icons/bi'
 import { FaHome, FaUser } from 'react-icons/fa'
+
 import { useSelector } from 'react-redux'
+
 import { Link, useNavigate } from 'react-router-dom'
+
 import app from '../../firebase/firebaseConfig'
+import { getAuth } from 'firebase/auth'
 import { getAllRoomData, setOfflineUser } from '../../firebase/room'
 import { setIsOnline } from '../../firebase/user'
+
 import ListFriends from '../ListFriends/ListFriends'
 import './sidebar.scss'
 
@@ -20,6 +24,7 @@ const Sidebar = () => {
     const [searchVal, setSearchVal] = useState('')
     const [listFriends, setListFriends] = useState([])
 
+
     useEffect(() => {
         const getData = async () => {
             const data = await getAllRoomData()
@@ -31,16 +36,9 @@ const Sidebar = () => {
         getData()
     }, [listFriends])
 
-    useEffect(() => {
-        window.addEventListener('beforeunload', onUnload)
-
-        return window.removeEventListener('beforeunload', onUnload)
+    window.addEventListener('unload', () => {
+        handleLogout()
     })
-
-    const onUnload = (e) => {
-        e.preventDefault()
-        e.returnValue = 'Hello'
-    }
 
     const handleLogout = async () => {
         await setIsOnline(userInfor.uid, false)

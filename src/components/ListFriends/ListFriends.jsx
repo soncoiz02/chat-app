@@ -27,7 +27,9 @@ const ListFriends = ({ listFriends }) => {
                                     <div className="display-name">{e.users.find(e => e.uid !== userInfor.uid).nickName}</div>
                                     <div className="recent-mess">
                                         {
-                                            e.messages[e.messages.length - 1].sender === userInfor.uid ? `You: ${e.messages[e.messages.length - 1].content}` : e.messages[e.messages.length - 1].content
+                                            e.messages[e.messages.length - 1].sender === userInfor.uid
+                                                ? `You: ${e.messages[e.messages.length - 1].content}`
+                                                : e.messages[e.messages.length - 1].content
                                         }
                                     </div>
                                 </div>

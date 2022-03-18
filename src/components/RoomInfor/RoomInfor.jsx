@@ -68,15 +68,10 @@ const RoomInfor = ({ recieveUser, roomData, currentUser }) => {
     const roomId = useParams().id
     const dispatch = useDispatch()
 
-    const [mainUser, setMainUser] = useState()
-    const [otherUser, setOtherUser] = useState()
-
-    const [mainUserNickname, setMainUserNickname] = useState('')
-    const [otherUserNickname, setOtherUserNickname] = useState('')
+    const [currentUserNickname, setCurrentUserNickname] = useState('')
+    const [recieveUserNickname, setRecieveUserNickname] = useState('')
 
     useEffect(() => {
-        setMainUser(roomData.users.find(e => e.uid === currentUser.uid))
-        setOtherUser(roomData.users.find(e => e.uid !== currentUser.uid))
     }, [roomData])
 
     const handleChangeTheme = async (theme) => {
@@ -85,11 +80,11 @@ const RoomInfor = ({ recieveUser, roomData, currentUser }) => {
     }
 
     const handleChangeNickname = async () => {
-        if (mainUserNickname) {
-            roomData.users.find(e => e.uid === currentUser.uid).nickName = mainUserNickname
+        if (currentUserNickname) {
+            roomData.users.find(e => e.uid === currentUser.uid).nickName = currentUserNickname
         }
-        if (otherUserNickname) {
-            roomData.users.find(e => e.uid !== currentUser.uid).nickName = otherUserNickname
+        if (recieveUserNickname) {
+            roomData.users.find(e => e.uid !== currentUser.uid).nickName = recieveUserNickname
         }
         await changeNickname(roomId, roomData.users)
     }
@@ -98,9 +93,9 @@ const RoomInfor = ({ recieveUser, roomData, currentUser }) => {
         <div className='room-infor'>
             <div className="user">
                 <div className="avt">
-                    <img src={otherUser?.avatar} alt="" />
+                    <img src={recieveUser?.avatar} alt="" />
                 </div>
-                <div className="name">{otherUser?.nickName}</div>
+                <div className="name">{recieveUser?.nickName}</div>
             </div>
             <div className="setting">
                 <div className="change">
@@ -108,25 +103,25 @@ const RoomInfor = ({ recieveUser, roomData, currentUser }) => {
                     <div className="list-user">
                         <div className="item">
                             <div className="avt">
-                                <img src={mainUser?.avatar} alt="" />
+                                <img src={currentUser?.avatar} alt="" />
                             </div>
                             <input type="text"
-                                value={mainUserNickname}
-                                placeholder={mainUser?.nickName}
-                                onChange={(e) => setMainUserNickname(e.target.value)}
+                                value={currentUserNickname}
+                                placeholder={currentUser?.nickName}
+                                onChange={(e) => setCurrentUserNickname(e.target.value)}
                             />
                         </div>
                     </div>
                     <div className="list-user">
                         <div className="item">
                             <div className="avt">
-                                <img src={otherUser?.avatar} alt="" />
+                                <img src={recieveUser?.avatar} alt="" />
                             </div>
                             <input
                                 type="text"
-                                value={otherUserNickname}
-                                placeholder={otherUser?.nickName}
-                                onChange={(e) => setOtherUserNickname(e.target.value)}
+                                value={recieveUserNickname}
+                                placeholder={recieveUser?.nickName}
+                                onChange={(e) => setRecieveUserNickname(e.target.value)}
                             />
                         </div>
                     </div>

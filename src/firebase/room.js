@@ -1,5 +1,6 @@
 import app from "./firebaseConfig";
 import { child, get, getDatabase, onValue, orderByValue, query, ref, set } from 'firebase/database'
+import { async } from "@firebase/util";
 const db = getDatabase(app)
 
 export const addRoomData = async (roomId, data) => {
@@ -34,6 +35,11 @@ export const example = async () => {
 export const addMess = async (roomId, data) => {
     const dbRef = ref(db, `rooms/${roomId}/messages`)
     await set(dbRef, data)
+}
+
+export const createRoom = async (roomId, data) => {
+    const roomRef = ref(db, `rooms/${roomId}`)
+    await set(roomRef, data)
 }
 
 

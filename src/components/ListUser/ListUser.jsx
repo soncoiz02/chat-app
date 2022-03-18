@@ -1,12 +1,48 @@
 import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { setReciever } from '../../redux/action/user'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { createRoom, getRoomData } from '../../firebase/room'
 import './listUser.scss'
 const ListUser = () => {
     const userInfor = useSelector(state => state.user.infor)
     const onlineUsers = useSelector(state => state.user.onlineUsers)
-    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    const handleCheckRoom = async (roomId, recieveUser) => {
+        const roomData = await getRoomData(roomId)
+        if (roomData) {
+            navigate(`/room/${roomId}`)
+        }
+        else {
+            const roomData = {
+                id: roomId,
+                messages: [
+                ],
+                users: [
+                    {
+                        uid: userInfor.uid,
+                        nickName: userInfor.fullname,
+                        avatar: userInfor.avatar,
+                        isOnline: userInfor.isOnline
+                    },
+                    {
+                        uid: recieveUser.uid,
+                        nickName: recieveUser.fullname,
+                        avatar: recieveUser.avatar,
+                        isOnline: recieveUser.isOnline
+                    }
+                ],
+                colorTheme: {
+                    primary: '#5555ff',
+                    secondary: 'whitesmoke',
+                    color: '#5555ff',
+                    bg: '#f1fcff'
+                }
+            }
+            await createRoom(roomId, roomData)
+            navigate(`/room/${roomId}`)
+        }
+    }
 
     return (
         <div className='list'>
@@ -28,11 +64,10 @@ const ListUser = () => {
                                     <div className="status"><div className="dot off"></div>Offline</div>
                             }
                         </div>
-                        <Link
+                        <div
                             className='btn-send'
-                            to={`/room/${Number(e.uid) + Number(userInfor.uid)}`}
-                            onClick={() => dispatch(setReciever(onlineUsers[index]))}
-                        >Send Message</Link>
+                            onClick={() => handleCheckRoom(Number(e.uid) + Number(userInfor.uid), e)}
+                        >Send Message</div>
                     </div>
                 )
             }
