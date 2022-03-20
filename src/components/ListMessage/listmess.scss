@@ -1,13 +1,12 @@
 .list-mess {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   gap: 5px 0;
   width: 100%;
-  height: calc(100% - 60px);
+  height: calc(100% - 130px);
   padding: 15px 50px;
   overflow-y: auto;
-  justify-content: flex-end;
   background: var(--bg-color);
   .mess {
     position: relative;

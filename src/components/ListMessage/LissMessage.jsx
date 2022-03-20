@@ -22,7 +22,7 @@ const LissMessage = () => {
 
         <div className="list-mess">
             {
-                listMess?.map((mess, index) =>
+                listMess?.reverse().map((mess, index) =>
                     mess.sender === currentUserId ?
                         <div className='mess sender' key={index}>
                             <div className="btn-setting">

@@ -1,11 +1,13 @@
 import EmojiPicker from 'emoji-picker-react'
-import React, { useRef, useState } from 'react'
+import { set } from 'firebase/database'
+import React, { useEffect, useRef, useState } from 'react'
 import { BsFillImageFill } from 'react-icons/bs'
 import { FaPaperPlane } from 'react-icons/fa'
 import { HiEmojiHappy } from 'react-icons/hi'
 import { useDispatch, useSelector } from 'react-redux'
 import { addMess } from '../../firebase/room'
 import { setListMess } from '../../redux/action/room'
+import PreviewFile from '../PreviewFile/PreviewFile'
 import './messForm.scss'
 
 
@@ -13,12 +15,16 @@ const MessForm = ({ roomId, currentUser }) => {
     const listMess = useSelector(state => state.room.listMess)
     const dispatch = useDispatch()
 
+    useEffect(() => {
+        setMessVal('')
+        setFiles([])
+        setFilePreview([])
+    }, [roomId])
+
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
     const [messVal, setMessVal] = useState('')
     const [files, setFiles] = useState([])
-
-
-    const fileRef = useRef()
+    const [filePreview, setFilePreview] = useState([])
 
     const onEmojiClick = (e, obj) => {
         setMessVal(messVal + obj.emoji)
@@ -50,40 +56,48 @@ const MessForm = ({ roomId, currentUser }) => {
         }
     }
 
-    // const handleFile = (e) => {
-    //     const file = e.target.files[0]
-    //     if (file) {
-    //         const fileReader = new FileReader();
-    //         fileReader.readAsDataURL(file);
-    //         fileReader.addEventListener('load', () => {
-    //             if (file.type.includes('image')) {
-    //                 fileRef.current.insertAdjacentHTML('beforeend', `<div class="img"><img src="${fileReader.result}" /></div>`)
-    //             }
-    //             else if (file.type.includes('audio')) {
-    //                 fileRef.current.insertAdjacentHTML('beforeend', `<div class="audio">${file.name}</div>`)
-    //             }
-    //         })
-    //         files.push(file)
-    //         setFiles(files)
-    //         // setImgNameFile(file.name)
-    //         // setImgFile(file)
-    //     }
-    // }
+    const handleFile = (e) => {
+        const listFile = e.target.files
+        let currentFiles = []
+        for (let i = 0; i < listFile.length; i++) {
+            files.push(listFile[i])
+            currentFiles.push(listFile[i])
+        }
+        setFiles(files)
+        if (currentFiles.length > 0) {
+            currentFiles.forEach(file => {
+                if (file.type.includes('image')) {
+                    const fileReader = new FileReader()
+                    fileReader.readAsDataURL(file)
+                    fileReader.addEventListener('load', () => {
+                        filePreview.push(
+                            {
+                                name: file.name,
+                                result: fileReader.result,
+                                type: "image"
+                            }
+                        )
+                    })
+
+                }
+                else if (file.type.includes('application')) {
+                    filePreview.push(
+                        {
+                            name: file.name,
+                            type: "application"
+                        }
+                    )
+                }
+            })
+            setTimeout(() => {
+                setFilePreview([...filePreview])
+            }, 3000)
+        }
+
+    }
 
     return (
         <div className='mess-form'>
-            <form action="" className="form" onSubmit={(e) => handleSendMess(e)}>
-                <div className="preview-file" ref={fileRef}></div>
-                <input
-                    type="text"
-                    value={messVal}
-                    onChange={(e) => setMessVal(e.target.value)}
-                    placeholder='Write something'
-                />
-                <button type='submit'>
-                    <FaPaperPlane />
-                </button>
-            </form>
             <div className="option">
                 <div className="btn-add file">
                     <label htmlFor="file">
@@ -93,7 +107,8 @@ const MessForm = ({ roomId, currentUser }) => {
                     <input
                         type="file"
                         id='file'
-                    // onChange={(e) => handleFile(e)}
+                        onChange={(e) => handleFile(e)}
+                        multiple
                     />
                 </div>
                 <div className="btn-add icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
@@ -107,6 +122,28 @@ const MessForm = ({ roomId, currentUser }) => {
                     </div>
                 }
             </div>
+            <form action="" className="form" onSubmit={(e) => handleSendMess(e)}>
+                {
+                    filePreview.length > 0 &&
+                    <PreviewFile
+                        filePreview={filePreview}
+                        files={files}
+                        updateFilePreview={setFilePreview}
+                        updateFiles={setFiles}
+                    />
+                }
+                <div className="input">
+                    <input
+                        type="text"
+                        value={messVal}
+                        onChange={(e) => setMessVal(e.target.value)}
+                        placeholder='Write something'
+                    />
+                    <button type='submit'>
+                        <FaPaperPlane />
+                    </button>
+                </div>
+            </form>
         </div>
     )
 }
