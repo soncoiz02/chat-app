@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { setReciever } from '../../redux/action/user'
@@ -7,6 +7,39 @@ import './listFriends.scss'
 const ListFriends = ({ listFriends }) => {
     const userInfor = useSelector(state => state.user.infor)
     const dispatch = useDispatch()
+
+    const [lastMess, setlassMess] = useState()
+
+    useEffect(() => {
+        const listLastMess = listFriends.map(e => e.messages[e.messages.length - 1])
+        let listMess = []
+        listLastMess.forEach(e => {
+            if (e.sender === userInfor.uid) {
+                if (e.content) {
+                    listMess.push(`You: ${e.content}`)
+                }
+                else if (e.img) {
+                    listMess.push("You had send an image")
+                }
+                else if (e.file) {
+                    listMess.push("You had send a file")
+                }
+            }
+            else {
+                if (e.content) {
+                    listMess.push(`${e.content}`)
+                }
+                else if (e.img) {
+                    listMess.push(`${e.sender.nickName} had send an image`)
+                }
+                else if (e.file) {
+                    listMess.push(`${e.sender.nickName} had send a file`)
+                }
+            }
+        })
+        setlassMess(listMess)
+    }, [listFriends])
+
     return (
         <div className='list-friends'>
             {
@@ -27,9 +60,7 @@ const ListFriends = ({ listFriends }) => {
                                     <div className="display-name">{e.users.find(e => e.uid !== userInfor.uid).nickName}</div>
                                     <div className="recent-mess">
                                         {
-                                            e.messages[e.messages.length - 1].sender === userInfor.uid
-                                                ? `You: ${e.messages[e.messages.length - 1].content}`
-                                                : e.messages[e.messages.length - 1].content
+                                            lastMess[index]
                                         }
                                     </div>
                                 </div>

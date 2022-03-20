@@ -1,6 +1,6 @@
 import app from "./firebaseConfig";
 import { child, get, getDatabase, onValue, orderByValue, query, ref, set } from 'firebase/database'
-import { async } from "@firebase/util";
+
 const db = getDatabase(app)
 
 export const addRoomData = async (roomId, data) => {
