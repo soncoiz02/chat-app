@@ -11,7 +11,6 @@ export type UserType = {
   displayName: string;
   status: boolean;
   avatar: string;
-  birthday: Date;
-  username: string;
-  uid: string;
+  birthday: Date | null;
+  email: string;
 };

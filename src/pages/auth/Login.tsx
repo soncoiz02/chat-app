@@ -1,5 +1,5 @@
 import { IconButton, InputAdornment, Stack, Typography } from "@mui/material";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 import LoginImage from "../../assets/login.png";
 
@@ -20,18 +20,19 @@ import {
   rightIn,
 } from "../../utils/keyframs";
 
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { AxiosError } from "axios";
+import * as yup from "yup";
+import useAuth from "../../hooks/useAuth";
+import { saveUserInfo } from "../../redux/features/user/userSlice";
+import { useAppDispatch } from "../../redux/hook";
+import { login } from "../../services/auth";
+import { IsNavigateProp } from "../../types/styledComponents";
 
-const Login = () => {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [isNavigate, setIsNavigate] = useState<boolean>(false);
+// styled components
 
-  const navigate = useNavigate();
-
-  // styled components
-
-  const ImgWrapper = styled(Stack)`
+const ImgWrapper = styled(Stack)<IsNavigateProp>(
+  ({ isNavigate }) => css`
     position: absolute;
     top: 0;
     left: 0;
@@ -39,14 +40,16 @@ const Login = () => {
     opacity: 0;
     height: 100%;
     img {
-      width: 90%;
+      width: 80%;
     }
 
     animation: ${isNavigate ? leftInReverse : leftIn} 1.5s ease-out forwards;
     animation-delay: ${isNavigate ? "0" : "1s"};
-  `;
+  `
+);
 
-  const LoginBox = styled(Stack)`
+const LoginBox = styled(Stack)<IsNavigateProp>(
+  ({ isNavigate }) => css`
     height: 100%;
     box-shadow: 0px 0px 2px 0px rgba(145, 158, 171, 0.2),
       0px 12px 24px -4px rgba(145, 158, 171, 0.12);
@@ -54,13 +57,30 @@ const Login = () => {
     animation: ${isNavigate ? righInReverse : rightIn} 1s ease-out forwards;
     z-index: 2;
     padding: 30px 80px;
-  `;
+  `
+);
 
-  const LoginWrapper = styled(Stack)`
+const LoginWrapper = styled(Stack)<IsNavigateProp>(
+  ({ isNavigate }) => css`
     opacity: 0;
     animation: ${isNavigate ? disappear : fadeIn} 1s forwards;
     animation-delay: ${isNavigate ? "0" : "1s"};
-  `;
+  `
+);
+
+// -------------------------------------------------------------------------
+
+const Login = () => {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isNavigate, setIsNavigate] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+
+  const { saveToken } = useAuth();
+
+  // redux
+
+  const dispatch = useAppDispatch();
 
   // yup validation
 
@@ -90,10 +110,28 @@ const Login = () => {
     resolver: yupResolver(loginSchema),
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, setError } = methods;
 
-  const handleLogin: SubmitHandler<LoginFormType> = (values) => {
-    console.log(values);
+  const onSubmit: SubmitHandler<LoginFormType> = (values) => {
+    handleLogin(values);
+  };
+
+  const handleLogin = async (loginData: LoginFormType) => {
+    try {
+      const response = await login(loginData);
+      const { accessToken, userInfo } = response;
+      saveToken(accessToken);
+      dispatch(saveUserInfo(userInfo));
+      handleSwitchPage("/");
+    } catch (error) {
+      const err = error as AxiosError;
+      const errData = err.response?.data;
+      if (errData) {
+        return setError(errData?.field, { message: errData?.message });
+      }
+
+      alert("Login fail!");
+    }
   };
 
   // handle show password
@@ -102,24 +140,33 @@ const Login = () => {
 
   // handle switch page
 
-  const handleSwitchPage = () => {
+  const handleSwitchPage = (path: string) => {
     setIsNavigate(true);
     setTimeout(() => {
-      navigate("/auth/register");
+      navigate(path);
     }, 1500);
   };
 
   return (
     <Stack direction="row" width="100%" height="100%" justifyContent="flex-end">
-      <ImgWrapper alignItems="center" justifyContent="center">
+      <ImgWrapper
+        alignItems="center"
+        justifyContent="center"
+        isNavigate={isNavigate}
+      >
         <img src={LoginImage} alt="Login Image" />
       </ImgWrapper>
-      <LoginBox justifyContent="center" alignItems="center">
+      <LoginBox
+        justifyContent="center"
+        alignItems="center"
+        isNavigate={isNavigate}
+      >
         <LoginWrapper
           width="100%"
           height="100%"
           justifyContent="center"
           alignItems="center"
+          isNavigate={isNavigate}
         >
           <Stack
             width="100%"
@@ -128,14 +175,14 @@ const Login = () => {
             mb={8}
             mt={8}
           >
-            <Typography variant="h3" fontWeight={800}>
+            <Typography variant="h3" fontWeight={800} textAlign="center">
               Wellcome Back!
             </Typography>
             <Typography variant="subtitle1">
               Please enter your details
             </Typography>
           </Stack>
-          <FormProvider onSubmit={handleSubmit(handleLogin)} methods={methods}>
+          <FormProvider onSubmit={handleSubmit(onSubmit)} methods={methods}>
             <Stack gap={2} width="100%">
               <TextFieldCustom
                 name="email"
@@ -176,7 +223,9 @@ const Login = () => {
             gap={1}
           >
             You don't have an account ?
-            <CustomLink onClick={handleSwitchPage}>Register</CustomLink>
+            <CustomLink onClick={() => handleSwitchPage("/auth/register")}>
+              Register
+            </CustomLink>
           </RegisterText>
         </LoginWrapper>
       </LoginBox>

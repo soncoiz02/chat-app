@@ -2,8 +2,8 @@ import { Grid, InputAdornment, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import { RegisterFormType } from "../../types/auth";
+import styled, { css } from "styled-components";
+import { RegisterDataType, RegisterFormType } from "../../types/auth";
 import {
   disappear,
   fadeIn,
@@ -28,16 +28,25 @@ import {
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { AxiosError } from "axios";
+import { register } from "../../services/auth";
+import useAuth from "../../hooks/useAuth";
+import { useAppDispatch } from "../../redux/hook";
+import { saveUserInfo } from "../../redux/features/user/userSlice";
+import { IsNavigateProp } from "../../types/styledComponents";
 
-const Register = () => {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [isNavigate, setIsNavigate] = useState<boolean>(false);
+// styled components
 
-  const navigate = useNavigate();
+const LoginWrapper = styled(Stack)<IsNavigateProp>(
+  ({ isNavigate }) => css`
+    opacity: 0;
+    animation: ${isNavigate ? disappear : fadeIn} 1s forwards;
+    animation-delay: ${isNavigate ? "0" : "1s"};
+  `
+);
 
-  // styled components
-
-  const ImgWrapper = styled(Stack)`
+const ImgWrapper = styled(Stack)<IsNavigateProp>(
+  ({ isNavigate }) => css`
     position: absolute;
     top: 0;
     right: 0;
@@ -50,9 +59,11 @@ const Register = () => {
 
     animation: ${isNavigate ? leftOutReverse : leftOut} 1.5s ease-out forwards;
     animation-delay: ${isNavigate ? "0" : "1s"};
-  `;
+  `
+);
 
-  const LoginBox = styled(Stack)`
+const LoginBox = styled(Stack)<IsNavigateProp>(
+  ({ isNavigate }) => css`
     height: 100%;
     box-shadow: 0px 0px 2px 0px rgba(145, 158, 171, 0.2),
       0px 12px 24px -4px rgba(145, 158, 171, 0.12);
@@ -60,19 +71,40 @@ const Register = () => {
     animation: ${isNavigate ? rightOutReverse : rightOut} 1s ease-out forwards;
     z-index: 2;
     padding: 30px 80px;
-  `;
+  `
+);
 
-  const LoginWrapper = styled(Stack)`
-    opacity: 0;
-    animation: ${isNavigate ? disappear : fadeIn} 1s forwards;
-    animation-delay: ${isNavigate ? "0" : "1s"};
-  `;
+// --------------------------------------------------------------------------
+
+const Register = () => {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isNavigate, setIsNavigate] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+
+  // useAuth
+
+  const { saveToken } = useAuth();
+
+  // redux dispatch
+
+  const dispatch = useAppDispatch();
 
   // yup
 
   const registerSchema = yup.object().shape({
-    firstname: yup.string().trim().required("First name is required"),
-    lastname: yup.string().trim().required("Last name is required"),
+    firstname: yup
+      .string()
+      .trim()
+      .matches(/^[A-Za-z ]*$/, "Please enter valid name")
+      .max(40)
+      .required("First name is required"),
+    lastname: yup
+      .string()
+      .trim()
+      .matches(/^[A-Za-z ]*$/, "Please enter valid name")
+      .max(40)
+      .required("Last name is required"),
     email: yup
       .string()
       .trim()
@@ -106,10 +138,35 @@ const Register = () => {
     resolver: yupResolver(registerSchema),
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, setError } = methods;
 
-  const handleLogin: SubmitHandler<RegisterFormType> = (values) => {
-    console.log(values);
+  const onSubmit: SubmitHandler<RegisterFormType> = (values) => {
+    const { firstname, lastname, email, password } = values;
+    const registerData = {
+      displayName: `${firstname} ${lastname}`,
+      email,
+      password,
+    };
+
+    handleRegister(registerData);
+  };
+
+  const handleRegister = async (registerData: RegisterDataType) => {
+    try {
+      const response = await register(registerData);
+      const { accessToken, userInfo } = response;
+      saveToken(accessToken);
+      dispatch(saveUserInfo(userInfo));
+      handleSwitchPage("/");
+    } catch (error) {
+      const err = error as AxiosError;
+      const errData = err.response?.data;
+      if (errData) {
+        return setError(errData?.field, { message: errData?.message });
+      }
+
+      alert("Login fail!");
+    }
   };
 
   // handle show password
@@ -118,10 +175,10 @@ const Register = () => {
 
   // handle switch page
 
-  const handleSwitchPage = () => {
+  const handleSwitchPage = (path: string) => {
     setIsNavigate(true);
     setTimeout(() => {
-      navigate("/auth/login");
+      navigate(path);
     }, 1500);
   };
 
@@ -132,12 +189,17 @@ const Register = () => {
       height="100%"
       justifyContent="flex-start"
     >
-      <LoginBox justifyContent="center" alignItems="center">
+      <LoginBox
+        justifyContent="center"
+        alignItems="center"
+        isNavigate={isNavigate}
+      >
         <LoginWrapper
           width="100%"
           height="100%"
           justifyContent="center"
           alignItems="center"
+          isNavigate={isNavigate}
         >
           <Stack
             width="100%"
@@ -153,7 +215,7 @@ const Register = () => {
               Please enter your details
             </Typography>
           </Stack>
-          <FormProvider onSubmit={handleSubmit(handleLogin)} methods={methods}>
+          <FormProvider onSubmit={handleSubmit(onSubmit)} methods={methods}>
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <TextFieldCustom
@@ -238,11 +300,17 @@ const Register = () => {
             gap={1}
           >
             You already have an account ?
-            <CustomLink onClick={handleSwitchPage}>Login</CustomLink>
+            <CustomLink onClick={() => handleSwitchPage("/auth/login")}>
+              Login
+            </CustomLink>
           </RegisterText>
         </LoginWrapper>
       </LoginBox>
-      <ImgWrapper alignItems="center" justifyContent="center">
+      <ImgWrapper
+        alignItems="center"
+        justifyContent="center"
+        isNavigate={isNavigate}
+      >
         <img src={RegisterImage} alt="Register Image" />
       </ImgWrapper>
     </Stack>
