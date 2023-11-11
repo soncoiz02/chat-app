@@ -1,146 +1,81 @@
-import { Avatar, Box, Grid, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Grid, Link, Stack, Typography } from "@mui/material";
 import { format } from "date-fns";
 import styled from "styled-components";
 import { FriendType } from "../../types/user";
-
-const listFriend: FriendType[] = [
-  {
-    displayName: "Dasha",
-    status: false,
-    avatar: "",
-    displayMessage: {
-      newestMessage: "Hello, how are you today ?",
-      totalUnreadMessage: 2,
-      time: new Date(),
-    },
-  },
-  {
-    displayName: "Sowl",
-    status: true,
-    avatar: "",
-    displayMessage: {
-      newestMessage: "Hello, how are you today ?",
-      totalUnreadMessage: 2,
-      time: new Date(),
-    },
-  },
-  {
-    displayName: "Hana",
-    status: true,
-    avatar: "",
-    displayMessage: {
-      newestMessage: "Hello, how are you today ?",
-      totalUnreadMessage: 0,
-      time: new Date(),
-    },
-  },
-  {
-    displayName: "Dasha",
-    status: true,
-    avatar: "",
-    displayMessage: {
-      newestMessage: "Hello, how are you today ?",
-      totalUnreadMessage: 2,
-      time: new Date(),
-    },
-  },
-  {
-    displayName: "Sowl",
-    status: true,
-    avatar: "",
-    displayMessage: {
-      newestMessage: "Hello, how are you today ?",
-      totalUnreadMessage: 0,
-      time: new Date(),
-    },
-  },
-  {
-    displayName: "Hana",
-    status: true,
-    avatar: "",
-    displayMessage: {
-      newestMessage: "Hello, how are you today ?",
-      totalUnreadMessage: 2,
-      time: new Date(),
-    },
-  },
-  {
-    displayName: "Dasha",
-    status: true,
-    avatar: "",
-    displayMessage: {
-      newestMessage: "Hello, how are you today ?",
-      totalUnreadMessage: 2,
-      time: new Date(),
-    },
-  },
-  {
-    displayName: "Sowl",
-    status: true,
-    avatar: "",
-    displayMessage: {
-      newestMessage: "Hello, how are you today ?",
-      totalUnreadMessage: 2,
-      time: new Date(),
-    },
-  },
-  {
-    displayName: "Hana",
-    status: true,
-    avatar: "",
-    displayMessage: {
-      newestMessage: "Hello, how are you today ?",
-      totalUnreadMessage: 2,
-      time: new Date(),
-    },
-  },
-];
+import { useEffect, useState } from "react";
+import { getUserFriend } from "../../services/user";
+import { Link as RouterLink } from "react-router-dom";
 
 const ListFriend = () => {
+  const [listFriends, setListFriends] = useState<FriendType[]>([]);
+
+  const handleGetFriends = async () => {
+    try {
+      const response = await getUserFriend();
+      setListFriends(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    handleGetFriends();
+  }, []);
+
   return (
     <ListFriendStyle
       gap={1}
       flexGrow={3}
       sx={{ overflowY: "auto", overflowX: "unset" }}
     >
-      {listFriend.map((friend: FriendType, index: number) => (
-        <Wrapper key={index}>
-          <Grid container spacing={1}>
-            <Grid item xs={2} sx={{ position: "relative" }}>
-              <Avatar sx={{ width: "40px", height: "40px" }} />
-              <StatusDot
-                sx={{ background: friend.status ? "#15c615" : "grey" }}
-              ></StatusDot>
+      {listFriends &&
+        listFriends.map((friend: FriendType) => (
+          <Wrapper
+            key={friend._id}
+            component={RouterLink}
+            to={`/chat/${friend.friendId}`}
+            underline="none"
+          >
+            <Grid container spacing={1}>
+              <Grid item xs={2} sx={{ position: "relative" }}>
+                <Avatar sx={{ width: "40px", height: "40px" }} />
+                <StatusDot
+                  sx={{ background: friend.status ? "#15c615" : "grey" }}
+                ></StatusDot>
+              </Grid>
+              <Grid item xs={7}>
+                <Stack>
+                  <Typography variant="body1" fontWeight={700}>
+                    {friend.displayName}
+                  </Typography>
+                  <NewestMessage variant="subtitle2" fontWeight={500}>
+                    {friend?.displayMessage?.newestMessage || "Test message"}
+                  </NewestMessage>
+                </Stack>
+              </Grid>
+              <Grid item xs={3}>
+                <Stack gap={0.5} alignItems="flex-end">
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight={600}
+                    color="#4c4c4c"
+                  >
+                    {format(
+                      friend?.displayMessage?.time || new Date(),
+                      "MMM dd"
+                    )}
+                  </Typography>
+                  {friend?.displayMessage?.totalUnreadMessage ||
+                    (0 > 0 && (
+                      <NumberCircle>
+                        {friend?.displayMessage?.totalUnreadMessage}
+                      </NumberCircle>
+                    ))}
+                </Stack>
+              </Grid>
             </Grid>
-            <Grid item xs={7}>
-              <Stack>
-                <Typography variant="body1" fontWeight={700}>
-                  {friend.displayName}
-                </Typography>
-                <NewestMessage variant="subtitle2" fontWeight={500}>
-                  {friend.displayMessage.newestMessage}
-                </NewestMessage>
-              </Stack>
-            </Grid>
-            <Grid item xs={3}>
-              <Stack gap={0.5} alignItems="flex-end">
-                <Typography
-                  variant="subtitle2"
-                  fontWeight={600}
-                  color="#4c4c4c"
-                >
-                  {format(friend.displayMessage.time, "MMM dd")}
-                </Typography>
-                {friend.displayMessage.totalUnreadMessage > 0 && (
-                  <NumberCircle>
-                    {friend.displayMessage.totalUnreadMessage}
-                  </NumberCircle>
-                )}
-              </Stack>
-            </Grid>
-          </Grid>
-        </Wrapper>
-      ))}
+          </Wrapper>
+        ))}
     </ListFriendStyle>
   );
 };
@@ -151,7 +86,7 @@ const ListFriendStyle = styled(Stack)`
   }
 `;
 
-const Wrapper = styled(Box)`
+const Wrapper = styled(Link)`
   position: relative;
   width: 100%;
   border-radius: 10px;

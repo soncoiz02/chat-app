@@ -43,6 +43,9 @@ const SideBarLayout = styled(Box)`
   height: 100vh;
   padding: 10px 0 30px 0;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  left: 0;
 `;
 
 const IconButton = styled("button")`

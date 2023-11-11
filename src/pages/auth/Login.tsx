@@ -24,7 +24,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { AxiosError } from "axios";
 import * as yup from "yup";
 import useAuth from "../../hooks/useAuth";
-import { saveUserInfo } from "../../redux/features/user/userSlice";
 import { useAppDispatch } from "../../redux/hook";
 import { login } from "../../services/auth";
 import { IsNavigateProp } from "../../types/styledComponents";
@@ -32,7 +31,7 @@ import { IsNavigateProp } from "../../types/styledComponents";
 // styled components
 
 const ImgWrapper = styled(Stack)<IsNavigateProp>(
-  ({ isNavigate }) => css`
+  ({ isnavigate }) => css`
     position: absolute;
     top: 0;
     left: 0;
@@ -43,28 +42,28 @@ const ImgWrapper = styled(Stack)<IsNavigateProp>(
       width: 80%;
     }
 
-    animation: ${isNavigate ? leftInReverse : leftIn} 1.5s ease-out forwards;
-    animation-delay: ${isNavigate ? "0" : "1s"};
+    animation: ${isnavigate ? leftInReverse : leftIn} 1.5s ease-out forwards;
+    animation-delay: ${isnavigate ? "0" : "1s"};
   `
 );
 
 const LoginBox = styled(Stack)<IsNavigateProp>(
-  ({ isNavigate }) => css`
+  ({ isnavigate }) => css`
     height: 100%;
     box-shadow: 0px 0px 2px 0px rgba(145, 158, 171, 0.2),
       0px 12px 24px -4px rgba(145, 158, 171, 0.12);
     background: white;
-    animation: ${isNavigate ? righInReverse : rightIn} 1s ease-out forwards;
+    animation: ${isnavigate ? righInReverse : rightIn} 1s ease-out forwards;
     z-index: 2;
     padding: 30px 80px;
   `
 );
 
 const LoginWrapper = styled(Stack)<IsNavigateProp>(
-  ({ isNavigate }) => css`
+  ({ isnavigate }) => css`
     opacity: 0;
-    animation: ${isNavigate ? disappear : fadeIn} 1s forwards;
-    animation-delay: ${isNavigate ? "0" : "1s"};
+    animation: ${isnavigate ? disappear : fadeIn} 1s forwards;
+    animation-delay: ${isnavigate ? "0" : "1s"};
   `
 );
 
@@ -76,7 +75,7 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const { saveToken } = useAuth();
+  const { saveAuthInfo } = useAuth();
 
   // redux
 
@@ -119,18 +118,18 @@ const Login = () => {
   const handleLogin = async (loginData: LoginFormType) => {
     try {
       const response = await login(loginData);
-      const { accessToken, userInfo } = response;
-      saveToken(accessToken);
-      dispatch(saveUserInfo(userInfo));
+      saveAuthInfo(response);
       handleSwitchPage("/");
     } catch (error) {
       const err = error as AxiosError;
-      const errData = err.response?.data;
-      if (errData) {
-        return setError(errData?.field, { message: errData?.message });
-      }
+      if (err) {
+        const errData = err.response?.data;
+        if (errData) {
+          return setError(errData?.field, { message: errData?.message });
+        }
 
-      alert("Login fail!");
+        alert("Login fail!");
+      }
     }
   };
 
@@ -152,21 +151,21 @@ const Login = () => {
       <ImgWrapper
         alignItems="center"
         justifyContent="center"
-        isNavigate={isNavigate}
+        isnavigate={isNavigate}
       >
         <img src={LoginImage} alt="Login Image" />
       </ImgWrapper>
       <LoginBox
         justifyContent="center"
         alignItems="center"
-        isNavigate={isNavigate}
+        isnavigate={isNavigate}
       >
         <LoginWrapper
           width="100%"
           height="100%"
           justifyContent="center"
           alignItems="center"
-          isNavigate={isNavigate}
+          isnavigate={isNavigate}
         >
           <Stack
             width="100%"

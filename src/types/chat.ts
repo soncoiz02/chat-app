@@ -1,11 +1,14 @@
 import { UserType } from "./user";
 
 export type ChatUserType = {
-  userInfo: UserType;
+  user: UserType;
   nickname: string;
 };
 
 export type NormalChatType = {
-  users: ChatUserType[];
+  _id: string;
+  users: {
+    users: ChatUserType[];
+  };
   color: string;
 };

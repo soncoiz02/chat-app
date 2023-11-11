@@ -1,3 +1,3 @@
 export type IsNavigateProp = {
-  isNavigate: boolean;
+  isnavigate: boolean;
 };

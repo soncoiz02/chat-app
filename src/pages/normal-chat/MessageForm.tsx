@@ -1,9 +1,19 @@
 import { Stack } from "@mui/material";
 import { ChangeEvent, FormEvent, KeyboardEvent, useState } from "react";
 import styled from "styled-components";
+import useAuth from "../../hooks/useAuth";
+import { socket } from "../../socket";
+import { NormalMessageType } from "../../types/message";
 
-const MessageForm = () => {
+type PropsType = {
+  roomId: string;
+  handleUpdateNewMessage: (data: NormalMessageType) => void;
+};
+
+const MessageForm = ({ roomId, handleUpdateNewMessage }: PropsType) => {
   const [messageValue, setMessageValue] = useState<string>("");
+
+  const { getUserId } = useAuth();
 
   const handleResize = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const element = e.currentTarget;
@@ -15,19 +25,35 @@ const MessageForm = () => {
   const handlePressShiftEnter = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     const keyCode = e.which || e.key;
 
-    // 13 represents the Enter key
     if (keyCode === 13 && !e.shiftKey) {
       // Don't generate a new line
       e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (messageValue) {
+      const messageData: NormalMessageType = {
+        from: getUserId(),
+        attachment: null,
+        chatId: roomId,
+        createdAt: new Date(),
+        message: messageValue,
+      };
+      handleUpdateNewMessage(messageData);
+      socket.emit("send-message", messageData);
+      setMessageValue("");
     }
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log(messageValue);
   };
 
   return (
-    <Stack>
+    <Stack mt={2}>
       <Form onSubmit={handleSubmit}>
         <CustomTextArea
           name=""

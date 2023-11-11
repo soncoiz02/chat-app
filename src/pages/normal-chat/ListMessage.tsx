@@ -1,132 +1,157 @@
 import { Avatar, Stack, Typography } from "@mui/material";
+import { useEffect } from "react";
 import styled from "styled-components";
+import useAuth from "../../hooks/useAuth";
+import { useAppSelector } from "../../redux/hook";
+import { socket } from "../../socket";
 import { ChatUserType } from "../../types/chat";
 import { NormalMessageType } from "../../types/message";
 import { formatToTime } from "../../utils/dateFormat";
 
-const messageData: NormalMessageType[] = [
-  {
-    attachment: null,
-    message: "Hello, how are you ?",
-    from: "son1",
-    chatId: "",
-    createdAt: new Date(),
-  },
-  {
-    attachment: null,
-    message: "I'm fine thank you",
-    from: "son2",
-    chatId: "",
-    createdAt: new Date(),
-  },
-];
+import InfiniteScroll from "react-infinite-scroll-component";
 
-const currentUser = "son2";
-
-const chatInfo = {
-  users: [
-    {
-      userInfo: {
-        avatar: "",
-        birthday: new Date(),
-        displayName: "Sol Henry",
-        status: true,
-        uid: "son1",
-        username: "",
-      },
-      nickname: "",
-    },
-    {
-      userInfo: {
-        avatar: "",
-        birthday: new Date(),
-        displayName: "Hana Rub",
-        status: true,
-        uid: "son2",
-        username: "",
-      },
-      nickname: "",
-    },
-  ],
-  color: "blue",
+type PropsType = {
+  roomId: string;
+  listMessage: NormalMessageType[];
+  handleUpdateNewMessage: (data: NormalMessageType) => void;
+  handleGetMoreMessage: () => void;
+  disable: boolean;
 };
 
-const ListMessage = () => {
+const ListMessage = ({
+  roomId,
+  listMessage,
+  handleUpdateNewMessage,
+  handleGetMoreMessage,
+  disable,
+}: PropsType) => {
+  const { chatInfo } = useAppSelector((state) => state.chat);
+  const { userInfo } = useAppSelector((state) => state.user);
+
+  const { getUserId } = useAuth();
+
   const isCurrentUser = (user: string) => {
+    const currentUser = getUserId();
     return currentUser === user;
   };
 
   const getDisplayNameFromMessage = (message: NormalMessageType) => {
-    if (message.from === currentUser) return "You";
-    const user = chatInfo.users.find(
-      (user: ChatUserType) => user.userInfo.uid === message.from
+    if (isCurrentUser(message.from)) return "You";
+    const userList = chatInfo.users.users;
+
+    const user = userList?.find(
+      (user: ChatUserType) => user.user._id === message.from
     );
 
-    return user?.nickname ? user.nickname : user?.userInfo.displayName;
+    return user?.nickname ? user.nickname : user?.user.displayName;
   };
 
+  useEffect(() => {
+    socket.connect();
+
+    socket.emit("join-room", {
+      roomId,
+      userName: userInfo.displayName,
+    });
+
+    socket.on("receive-message", (data: NormalMessageType) => {
+      handleUpdateNewMessage(data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
+
   return (
-    <Wrapper justifyContent="flex-end">
-      {messageData.map((message: NormalMessageType, index: number) => (
-        <Stack
-          direction="row"
-          gap={1}
-          key={index}
-          justifyContent={
-            isCurrentUser(message.from) ? "flex-end" : "flex-start"
-          }
-          width={"100%"}
+    <Wrapper id="scrollableDiv">
+      {listMessage && (
+        <InfiniteScroll
+          dataLength={listMessage.length}
+          next={handleGetMoreMessage}
+          style={{
+            display: "flex",
+            flexDirection: "column-reverse",
+          }}
+          inverse={true}
+          hasMore={true && !disable}
+          loader={<Loading>Loading...</Loading>}
+          scrollableTarget="scrollableDiv"
         >
-          <Avatar
-            sx={{
-              order: isCurrentUser(message.from) ? 2 : 1,
-            }}
-          />
-          <Stack
-            gap={1}
-            order={isCurrentUser(message.from) ? 1 : 2}
-            alignItems={isCurrentUser(message.from) ? "flex-end" : "flex-start"}
-            flexGrow={2}
-          >
-            <Stack direction="row" alignItems="center" gap={1}>
-              <Typography
-                variant="body1"
-                fontWeight={800}
-                order={isCurrentUser(message.from) ? 2 : 1}
-              >
-                {getDisplayNameFromMessage(message)}
-              </Typography>
-              <Typography
-                variant="body2"
-                order={isCurrentUser(message.from) ? 1 : 2}
-              >
-                {formatToTime(message.createdAt)}
-              </Typography>
-            </Stack>
-            <MessageBox
-              variant="subtitle1"
-              sx={{
-                background: isCurrentUser(message.from) ? "black" : "#efefef",
-                color: isCurrentUser(message.from) ? "white" : "black",
-                borderRadius: isCurrentUser(message.from)
-                  ? "8px 3px 20px 12px"
-                  : "3px 8px 12px 20px",
-              }}
+          {listMessage.map((message: NormalMessageType, index: number) => (
+            <Stack
+              direction="row"
+              gap={1}
+              key={index}
+              width={"100%"}
+              justifyContent={
+                isCurrentUser(message.from) ? "flex-end" : "flex-start"
+              }
             >
-              dsasdsadghajwgdjwhagwdhj
-            </MessageBox>
-          </Stack>
-        </Stack>
-      ))}
+              <Avatar
+                sx={{
+                  order: isCurrentUser(message.from) ? 2 : 1,
+                }}
+              />
+              <Stack
+                gap={1}
+                order={isCurrentUser(message.from) ? 1 : 2}
+                alignItems={
+                  isCurrentUser(message.from) ? "flex-end" : "flex-start"
+                }
+                flexGrow={2}
+              >
+                <Stack direction="row" alignItems="center" gap={1}>
+                  <Typography
+                    variant="body1"
+                    fontWeight={800}
+                    order={isCurrentUser(message.from) ? 2 : 1}
+                  >
+                    {getDisplayNameFromMessage(message)}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    order={isCurrentUser(message.from) ? 1 : 2}
+                  >
+                    {formatToTime(new Date(message.createdAt))}
+                  </Typography>
+                </Stack>
+                <MessageBox
+                  variant="subtitle1"
+                  sx={{
+                    background: isCurrentUser(message.from)
+                      ? "black"
+                      : "#efefef",
+                    color: isCurrentUser(message.from) ? "white" : "black",
+                    borderRadius: isCurrentUser(message.from)
+                      ? "8px 3px 20px 12px"
+                      : "3px 8px 12px 20px",
+                    textAlign: isCurrentUser(message.from) ? "right" : "left",
+                  }}
+                >
+                  {message.message}
+                </MessageBox>
+              </Stack>
+            </Stack>
+          ))}
+        </InfiniteScroll>
+      )}
     </Wrapper>
   );
 };
 
-const Wrapper = styled(Stack)`
+const Loading = styled("div")`
+  font-size: 18px;
   width: 100%;
-  flex-grow: 1;
-  overflow-y: auto;
-  padding-bottom: 30px;
+  text-align: center;
+`;
+
+const Wrapper = styled("div")`
+  height: 500px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column-reverse;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -135,7 +160,6 @@ const Wrapper = styled(Stack)`
 const MessageBox = styled(Typography)`
   padding: 5px 10px;
   background: #efefef;
-  min-width: 100px;
   max-width: 45%;
   word-wrap: break-word;
 `;

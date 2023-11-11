@@ -19,6 +19,9 @@ const MuiTheme = ({ children }: { children: ReactNode }) => {
       body1: {
         fontSize: "18px",
       },
+      button: {
+        textTransform: "none",
+      },
     },
     palette: {
       primary: {

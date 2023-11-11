@@ -4,13 +4,19 @@ import { UserType } from "../../../types/user";
 
 // Define a type for the slice state
 
+type InitialStateType = {
+  userInfo: UserType;
+};
+
 // Define the initial state using that type
-const initialState: UserType = {
-  displayName: "",
-  avatar: "",
-  birthday: new Date(),
-  status: true,
-  email: "",
+const initialState: InitialStateType = {
+  userInfo: {
+    displayName: "",
+    avatar: "",
+    birthday: null,
+    status: true,
+    email: "",
+  },
 };
 
 export const userSlice = createSlice({
@@ -18,7 +24,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     saveUserInfo: (state, action: PayloadAction<UserType>) => {
-      state = { ...action.payload };
+      state.userInfo = action.payload;
     },
   },
 });
