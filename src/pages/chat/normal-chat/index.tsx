@@ -1,19 +1,21 @@
 import { Box, Divider, Stack } from "@mui/material";
 import styled from "styled-components";
-import ChatBoxHeader from "./ChatBoxHeader";
-import ListMessage from "./ListMessage";
-import MessageForm from "./MessageForm";
+import ChatBoxHeader from "../components/ChatBoxHeader";
+import ListMessage from "../components/ListMessage";
+import MessageForm from "../components/MessageForm";
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getChatData } from "../../redux/features/chat/chatSlice";
-import { useAppDispatch } from "../../redux/hook";
-import { getFriendMessage } from "../../services/message";
-import { NormalMessageType } from "../../types/message";
+import { getChatData } from "../../../redux/features/chat/chatSlice";
+import { useAppDispatch } from "../../../redux/hook";
+import { getFriendMessage } from "../../../services/message";
+import { GroupMessageType, NormalMessageType } from "../../../types/message";
+import useAuth from "../../../hooks/useAuth";
 
 const NormalChat = () => {
   const dispatch = useAppDispatch();
   const chatId = useParams().id as string;
+  const { getUserId } = useAuth();
 
   const [listMessage, setListMessage] = useState<NormalMessageType[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -49,13 +51,16 @@ const NormalChat = () => {
     }
   };
 
-  const updateNewMessage = (data: NormalMessageType) => {
-    setListMessage((listMessage) => [data, ...listMessage]);
+  const updateNewMessage = (data: NormalMessageType | GroupMessageType) => {
+    if ("chatId" in data)
+      setListMessage((listMessage) => [data, ...listMessage]);
   };
 
   useEffect(() => {
     if (chatId) {
-      dispatch(getChatData(chatId));
+      dispatch(
+        getChatData({ chatId, type: "friend", currentUserId: getUserId() })
+      );
       handleGetListMessage(chatId, page);
     }
     return () => {};
@@ -89,7 +94,7 @@ export const Wrapper = styled(Box)`
   height: 700px;
 `;
 
-const ChatBox = styled(Stack)`
+export const ChatBox = styled(Stack)`
   width: 100%;
   height: 100%;
   background: white;

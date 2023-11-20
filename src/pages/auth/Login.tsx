@@ -77,10 +77,6 @@ const Login = () => {
 
   const { saveAuthInfo } = useAuth();
 
-  // redux
-
-  const dispatch = useAppDispatch();
-
   // yup validation
 
   const loginSchema = yup.object().shape({

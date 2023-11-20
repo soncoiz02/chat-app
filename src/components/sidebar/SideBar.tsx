@@ -5,12 +5,21 @@ import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import ListFriend from "./ListFriend";
+import ListGroup from "./ListGroup";
+import CreateGroupModal from "./CreateGroupModal";
 const SideBar = () => {
   const [searchValue, setSearchValue] = useState<string>("");
+  const [switchList, setSwitchList] = useState<boolean>(false);
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+
+  const handleSwitchList = () => setSwitchList(!switchList);
+
+  const handleCloseModal = () => setIsOpenModal(false);
+
   return (
     <SideBarLayout>
       <Container maxWidth="xl" sx={{ height: "100%" }}>
-        <Stack gap={3} sx={{ height: "100%" }}>
+        <Stack sx={{ height: "100%" }}>
           <Stack
             direction="row"
             justifyContent="space-between"
@@ -19,11 +28,11 @@ const SideBar = () => {
             <Typography variant="h6" fontWeight={800}>
               {"Message (04)"}
             </Typography>
-            <IconButton>
+            <IconButton onClick={() => setIsOpenModal(true)}>
               <FontAwesomeIcon icon={faPenToSquare} />
             </IconButton>
           </Stack>
-          <Stack direction="row" alignItems="center" position="relative">
+          <Stack direction="row" alignItems="center" position="relative" mt={3}>
             <SearchInput
               placeholder="Search"
               value={searchValue}
@@ -31,12 +40,68 @@ const SideBar = () => {
             />
             <SearchIcon icon={faSearch} />
           </Stack>
-          <ListFriend />
+          <ListTitle className={switchList ? "active" : ""}>
+            <TitleStyle
+              className={switchList ? "" : "active"}
+              onClick={handleSwitchList}
+            >
+              Friends
+            </TitleStyle>
+            <TitleStyle
+              className={switchList ? "active" : ""}
+              onClick={handleSwitchList}
+            >
+              Groups
+            </TitleStyle>
+          </ListTitle>
+          {!switchList ? <ListFriend /> : <ListGroup />}
         </Stack>
       </Container>
+      <CreateGroupModal isOpen={isOpenModal} handleClose={handleCloseModal} />
     </SideBarLayout>
   );
 };
+
+const ListTitle = styled("div")`
+  display: flex;
+  width: 100%;
+  position: relative;
+  margin-top: 10px;
+
+  &::after {
+    position: absolute;
+    content: "";
+    bottom: 0;
+    left: 0;
+    right: auto;
+    width: 50%;
+    height: 3px;
+    border-radius: 50px;
+    background: #353849;
+    transition: 0.5s;
+  }
+
+  &.active {
+    &::after {
+      right: 0;
+      left: auto;
+    }
+  }
+`;
+
+const TitleStyle = styled("div")`
+  width: 50%;
+  padding: 5px 12px;
+  text-align: center;
+  cursor: pointer;
+  color: #4f4f4f;
+  font-weight: bold;
+  font-size: 18px;
+
+  &.active {
+    color: #353849;
+  }
+`;
 
 const SideBarLayout = styled(Box)`
   width: 350px;

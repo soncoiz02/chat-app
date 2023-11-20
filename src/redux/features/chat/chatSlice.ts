@@ -1,15 +1,56 @@
+import { ChatUserType, GroupWithMemberType } from "./../../../types/chat";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getChatData as handleGetChatData } from "../../../services/chat";
+import {
+  getGroupChat,
+  getChatData as handleGetChatData,
+} from "../../../services/chat";
 import { NormalChatType } from "../../../types/chat";
+
+type ChatInfoType = {
+  title: string;
+  color: string;
+  members: ChatUserType[];
+};
 
 // Define a thunk action
 
+type DataType = {
+  chatId: string;
+  type: "friend" | "group";
+  currentUserId: string;
+};
+
 export const getChatData = createAsyncThunk(
   "chat/getData",
-  async (friendId: string, { rejectWithValue }) => {
+  async (data: DataType, { rejectWithValue }) => {
+    const { chatId, type, currentUserId } = data;
     try {
-      const response = await handleGetChatData(friendId);
-      return response;
+      const state: ChatInfoType = {
+        title: "",
+        members: [],
+        color: "",
+      };
+      if (type === "friend") {
+        const response = await handleGetChatData(chatId);
+        const targetUser = response.users.users.find(
+          (user) => user.user._id !== currentUserId
+        );
+        state.title = targetUser?.user.displayName as string;
+        state.color = response.color;
+        state.members = response.users.users;
+      }
+
+      if (type === "group") {
+        const response = await getGroupChat(chatId);
+        state.title = response.title;
+        state.members = response.members.map((user) => ({
+          user: user.user,
+          nickname: user.nickname,
+        }));
+        state.color = response.color;
+      }
+
+      return state;
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -19,7 +60,7 @@ export const getChatData = createAsyncThunk(
 // Define a type for the slice state
 
 type InitialStateType = {
-  chatInfo: NormalChatType;
+  chatInfo: ChatInfoType;
   isLoading: boolean;
   errorMessage: string;
 };
@@ -27,7 +68,8 @@ type InitialStateType = {
 // Define the initial state using that type
 const initialState: InitialStateType = {
   chatInfo: {
-    users: [],
+    title: "",
+    members: [],
     color: "",
   },
   isLoading: false,

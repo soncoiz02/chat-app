@@ -1,19 +1,19 @@
 import { Avatar, Stack, Typography } from "@mui/material";
 import { useEffect } from "react";
 import styled from "styled-components";
-import useAuth from "../../hooks/useAuth";
-import { useAppSelector } from "../../redux/hook";
-import { socket } from "../../socket";
-import { ChatUserType } from "../../types/chat";
-import { NormalMessageType } from "../../types/message";
-import { formatToTime } from "../../utils/dateFormat";
+import useAuth from "../../../hooks/useAuth";
+import { useAppSelector } from "../../../redux/hook";
+import { socket } from "../../../socket";
+import { ChatUserType } from "../../../types/chat";
+import { GroupMessageType, NormalMessageType } from "../../../types/message";
+import { formatToTime } from "../../../utils/dateFormat";
 
 import InfiniteScroll from "react-infinite-scroll-component";
 
 type PropsType = {
   roomId: string;
-  listMessage: NormalMessageType[];
-  handleUpdateNewMessage: (data: NormalMessageType) => void;
+  listMessage: NormalMessageType[] | GroupMessageType[];
+  handleUpdateNewMessage: (data: NormalMessageType | GroupMessageType) => void;
   handleGetMoreMessage: () => void;
   disable: boolean;
 };
@@ -35,9 +35,11 @@ const ListMessage = ({
     return currentUser === user;
   };
 
-  const getDisplayNameFromMessage = (message: NormalMessageType) => {
+  const getDisplayNameFromMessage = (
+    message: NormalMessageType | GroupMessageType
+  ) => {
     if (isCurrentUser(message.from)) return "You";
-    const userList = chatInfo.users.users;
+    const userList = chatInfo.members;
 
     const user = userList?.find(
       (user: ChatUserType) => user.user._id === message.from
@@ -54,9 +56,12 @@ const ListMessage = ({
       userName: userInfo.displayName,
     });
 
-    socket.on("receive-message", (data: NormalMessageType) => {
-      handleUpdateNewMessage(data);
-    });
+    socket.on(
+      "receive-message",
+      (data: NormalMessageType | GroupMessageType) => {
+        handleUpdateNewMessage(data);
+      }
+    );
 
     return () => {
       socket.disconnect();
@@ -65,7 +70,7 @@ const ListMessage = ({
 
   return (
     <Wrapper id="scrollableDiv">
-      {listMessage && (
+      {listMessage.length > 0 && (
         <InfiniteScroll
           dataLength={listMessage.length}
           next={handleGetMoreMessage}
@@ -78,11 +83,11 @@ const ListMessage = ({
           loader={<Loading>Loading...</Loading>}
           scrollableTarget="scrollableDiv"
         >
-          {listMessage.map((message: NormalMessageType, index: number) => (
+          {listMessage.map((message: NormalMessageType | GroupMessageType) => (
             <Stack
               direction="row"
               gap={1}
-              key={index}
+              key={message._id}
               width={"100%"}
               justifyContent={
                 isCurrentUser(message.from) ? "flex-end" : "flex-start"

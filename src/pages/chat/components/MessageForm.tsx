@@ -1,17 +1,20 @@
 import { Stack } from "@mui/material";
 import { ChangeEvent, FormEvent, KeyboardEvent, useState } from "react";
 import styled from "styled-components";
-import useAuth from "../../hooks/useAuth";
-import { socket } from "../../socket";
-import { NormalMessageType } from "../../types/message";
+import useAuth from "../../../hooks/useAuth";
+import { socket } from "../../../socket";
+import { GroupMessageType, NormalMessageType } from "../../../types/message";
+import { useLocation } from "react-router-dom";
+import { verifyPathname } from "../../../utils/verifyPathname";
 
 type PropsType = {
   roomId: string;
-  handleUpdateNewMessage: (data: NormalMessageType) => void;
+  handleUpdateNewMessage: (data: NormalMessageType | GroupMessageType) => void;
 };
 
 const MessageForm = ({ roomId, handleUpdateNewMessage }: PropsType) => {
   const [messageValue, setMessageValue] = useState<string>("");
+  const { pathname } = useLocation();
 
   const { getUserId } = useAuth();
 
@@ -34,15 +37,27 @@ const MessageForm = ({ roomId, handleUpdateNewMessage }: PropsType) => {
 
   const handleSendMessage = async () => {
     if (messageValue) {
-      const messageData: NormalMessageType = {
+      const baseMessageData = {
         from: getUserId(),
         attachment: null,
-        chatId: roomId,
         createdAt: new Date(),
         message: messageValue,
       };
-      handleUpdateNewMessage(messageData);
-      socket.emit("send-message", messageData);
+      if (verifyPathname(pathname)) {
+        const messageData: NormalMessageType = {
+          ...baseMessageData,
+          chatId: roomId,
+        };
+        handleUpdateNewMessage(messageData);
+        socket.emit("send-message", messageData);
+      } else {
+        const messageData: GroupMessageType = {
+          ...baseMessageData,
+          groupId: roomId,
+        };
+        handleUpdateNewMessage(messageData);
+        socket.emit("send-message", messageData);
+      }
       setMessageValue("");
     }
   };

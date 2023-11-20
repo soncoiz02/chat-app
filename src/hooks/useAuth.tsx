@@ -12,6 +12,12 @@ type AuthInfo = {
   userInfo: UserType;
 };
 
+type JWTDecode = {
+  _id: string;
+  iat: number;
+  exp: number;
+};
+
 const useAuth = () => {
   const [cookies, setCookie] = useCookies(["accessToken", "userInfo"]);
 
@@ -50,9 +56,9 @@ const useAuth = () => {
     return !!cookies["accessToken"];
   };
 
-  const getUserId = () => {
+  const getUserId = (): string => {
     const accessToken = cookies["accessToken"];
-    return jwtDecode<any>(accessToken)._id;
+    return jwtDecode<JWTDecode>(accessToken)._id;
   };
 
   return { whoIAm, isLogin, saveAuthInfo, initialization, getUserId };

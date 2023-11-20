@@ -9,10 +9,30 @@ export type DisplayMessageType = {
   time: Date;
 };
 
-export type NormalMessageType = {
+interface BaseMessageType {
+  _id?: string;
   message: string;
   from: string;
   attachment: AttachmentType | null;
-  chatId: string;
   createdAt: Date;
+}
+
+export interface NormalMessageType extends BaseMessageType {
+  chatId: string;
+}
+
+export type ResponseFriendMessageType = {
+  message: NormalMessageType[];
+  total: number;
+};
+
+// Group message
+
+export interface GroupMessageType extends BaseMessageType {
+  groupId: string;
+}
+
+export type ResponseGroupMessageType = {
+  message: GroupMessageType[];
+  total: number;
 };
